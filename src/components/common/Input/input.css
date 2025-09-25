@@ -1,0 +1,35 @@
+.spotlux-input:-webkit-autofill,
+.spotlux-input:-webkit-autofill:hover,
+.spotlux-input:-webkit-autofill:focus,
+.spotlux-input:-webkit-autofill:active {
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: var(--text-col) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+  background: color-mix(in srgb, var(--text-col) 10%, transparent) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--text-col) 10%,
+    transparent
+  ) !important;
+  background-image: none !important;
+  border: 1px solid color-mix(in srgb, var(--text-col) 30%, transparent) !important;
+  border-color: color-mix(in srgb, var(--text-col) 30%, transparent) !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+}
+
+.spotlux-input:-moz-autofill {
+  background: color-mix(in srgb, var(--text-col) 10%, transparent) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--text-col) 10%,
+    transparent
+  ) !important;
+  color: var(--text-col) !important;
+  border: 1px solid color-mix(in srgb, var(--text-col) 30%, transparent) !important;
+}
+
+.spotlux-input:focus:-webkit-autofill {
+  box-shadow: 0 0 0 2px var(--primary-col) !important;
+  -webkit-box-shadow: 0 0 0 2px var(--primary-col) !important;
+}

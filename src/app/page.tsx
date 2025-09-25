@@ -1,5 +1,18 @@
+"use client";
+
+import { ProtectedRoute, PublicRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "@/components/landing";
+import Dashboard from "@/components/dashboard";
 
-const Landing = () => <LandingPage />;
-
-export default Landing;
+export default function Home() {
+  return (
+    <>
+      <PublicRoute>
+        <LandingPage />
+      </PublicRoute>
+      <ProtectedRoute redirectTo="/login">
+        <Dashboard />
+      </ProtectedRoute>
+    </>
+  );
+}

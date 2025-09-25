@@ -1,12 +1,12 @@
 "use client";
 
-import LoginPage from "@/components/login";
+import RegisterPage from "@/components/register";
 import { PublicRoute } from "@/components/auth/ProtectedRoute";
 
-export default function Login() {
+export default function Register() {
   return (
     <PublicRoute redirectTo="/">
-      <LoginPage />
+      <RegisterPage />
     </PublicRoute>
   );
 }

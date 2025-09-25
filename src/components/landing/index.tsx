@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Button } from "@/components/common/Button";
 
 export default function LandingPage() {
   return (
@@ -15,15 +16,14 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              href="/login"
-              className="bg-primary-col text-bg-col px-8 py-4 rounded-lg font-semibold text-lg hover:bg-primary-col/90 transition-colors"
-            >
-              Get Started
+            <Link href="/register">
+              <Button variant="primary" size="lg" className="px-8">
+                Get Started
+              </Button>
             </Link>
-            <button className="border border-text-col/30 text-text-col px-8 py-4 rounded-lg font-semibold text-lg hover:bg-text-col/10 transition-colors">
+            <Button variant="secondary" size="lg" className="px-8">
               Learn More
-            </button>
+            </Button>
           </div>
         </div>
       </section>
