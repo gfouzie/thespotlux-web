@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { ApiError } from "@/api";
-import { Button } from "@/components/common/Button";
-import { Input } from "@/components/common/Input";
+import Button from "@/components/common/Button";
+import Input from "@/components/common/Input/index";
 
 interface LoginFormData {
   email: string;
@@ -59,19 +60,29 @@ const LoginPage = () => {
 
   return (
     <div className="flex items-center justify-center py-16">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold mb-2 text-center">Welcome Back</h1>
-        <p className="text-text-col/70 text-center mb-8">
-          Sign in to your Spotlux account
-        </p>
+      <div className="w-full max-w-md relative">
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/thespotlux_logo.png"
+            alt="Spotlux Logo"
+            width={600}
+            height={150}
+            className="object-contain"
+            priority
+          />
+        </div>
+        <h3 className="text-2xl mb-2 text-center">SHINING ON THE FUTURE</h3>
 
         {error && (
           <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-4">
             {error}
           </div>
         )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-8 w-[640px] h-8 bg-text-col/70 z-10 spotlight-oval" />
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 bg-card-col px-4 py-6 rounded-md relative z-20"
+        >
           <Input
             id="email"
             name="email"
@@ -83,18 +94,29 @@ const LoginPage = () => {
             required
           />
 
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            label="Password"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleInputChange}
-            showPasswordToggle
-            required
-            minLength={8}
-          />
+          <div>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              label="Password"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleInputChange}
+              showPasswordToggle
+              required
+              minLength={8}
+            />
+            <div className="text-right mt-2">
+              <button
+                type="button"
+                onClick={() => console.log("Forgot password clicked")}
+                className="text-sm text-text-col hover:text-text-col/80 transition-colors cursor-pointer"
+              >
+                Forgot password?
+              </button>
+            </div>
+          </div>
 
           <Button
             type="submit"
@@ -110,7 +132,7 @@ const LoginPage = () => {
 
         <div className="mt-6 text-center">
           <p className="text-text-col/70">
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
               className="text-accent-col hover:text-accent-col/80 font-medium transition-colors"

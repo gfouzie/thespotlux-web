@@ -3,7 +3,7 @@
 :root {
   /* Light Mode Colors */
   --bg-col-light: #efefef;
-  --text-col-light: 343434;
+  --text-col-light: #343434;
   --accent-col-light: #ffc300;
   --card-col-light: #fffcfc;
   --component-col-light: #d3cfcf;
@@ -43,12 +43,26 @@
   --color-component-col: var(--component-col);
 
   /* Font settings */
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-martel-sans);
   --font-mono: var(--font-geist-mono);
+  --font-geist: var(--font-geist-sans);
 }
 
 body {
   background: var(--bg-col);
   color: var(--text-col);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-martel-sans), "Martel Sans", -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.spotlight-oval {
+  border-radius: 50%;
+  clip-path: ellipse(50% 50% at 50% 50%);
+  filter: blur(4px);
+  background: radial-gradient(
+    ellipse 60% 100% at center,
+    currentColor 0%,
+    currentColor 70%,
+    transparent 100%
+  );
 }

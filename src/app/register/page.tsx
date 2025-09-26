@@ -2,14 +2,20 @@
 
 import RegisterPage from "@/components/register";
 import { PublicRoute } from "@/components/auth/ProtectedRoute";
-import { ThemeProvider } from "@/contexts/ThemeContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useEffect } from "react";
 
 export default function Register() {
+  const { setTheme } = useTheme();
+
+  // Set dark theme for register page
+  useEffect(() => {
+    setTheme("dark");
+  }, [setTheme]);
+
   return (
-    <ThemeProvider defaultTheme="dark">
-      <PublicRoute redirectTo="/">
-        <RegisterPage />
-      </PublicRoute>
-    </ThemeProvider>
+    <PublicRoute redirectTo="/">
+      <RegisterPage />
+    </PublicRoute>
   );
 }

@@ -12,7 +12,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: React.ReactNode;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(
+const Input = forwardRef<HTMLInputElement, InputProps>(
   (
     {
       label,
@@ -62,7 +62,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               // Base styles
               "spotlux-input", // ← Component-specific class for autofill styles
               "w-full px-4 py-3 rounded-lg transition-all duration-200",
-              "bg-text-col/10 border border-text-col/30",
+              "bg-bg-col border border-text-col/30",
               "text-text-col placeholder-text-col/50",
               "focus:outline-none focus:ring-2 focus:ring-accent-col focus:border-transparent",
 
@@ -101,3 +101,5 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = "Input";
+
+export default Input;

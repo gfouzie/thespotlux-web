@@ -1,13 +1,18 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   return (
     <header className="flex justify-between items-center p-6 lg:px-12 bg-bg-col text-text-col">
-      <Link
-        href="/"
-        className="text-2xl font-bold text-accent-col hover:text-accent-col/80 transition-colors"
-      >
-        Spotlux
+      <Link href="/" className="hover:opacity-80 transition-opacity">
+        <Image
+          src="/thespotlux_logo.png"
+          alt="Spotlux Logo"
+          width={180}
+          height={45}
+          className="object-contain"
+          priority
+        />
       </Link>
 
       <div className="flex items-center gap-4">

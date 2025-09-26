@@ -42,18 +42,22 @@ export const ThemeProvider = ({
 
   // Initialize theme on mount (can check localStorage if you want persistence)
   useEffect(() => {
-    // Optional: Load saved theme from localStorage
-    const savedTheme = localStorage.getItem("spotlux-theme") as Theme;
-    if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
-      setTheme(savedTheme);
-    } else {
-      setTheme(defaultTheme);
+    // Prevent hydration mismatch by only reading localStorage on client
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("spotlux-theme") as Theme;
+      if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
+        setTheme(savedTheme);
+      } else {
+        setTheme(defaultTheme);
+      }
     }
   }, [defaultTheme]);
 
   // Save theme to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem("spotlux-theme", theme);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("spotlux-theme", theme);
+    }
   }, [theme]);
 
   const toggleTheme = () => {

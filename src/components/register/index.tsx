@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { userApi, ApiError } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
-import { Input } from "@/components/common/Input";
-import { Button } from "@/components/common/Button";
+import Input from "@/components/common/Input/index";
+import Button from "@/components/common/Button";
 
 interface FormData {
   email: string;

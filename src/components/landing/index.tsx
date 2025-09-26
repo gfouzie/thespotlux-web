@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/common/Button";
+import Button from "@/components/common/Button";
 
 export default function LandingPage() {
   return (

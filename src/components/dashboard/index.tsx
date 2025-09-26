@@ -3,7 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
-import { Button } from "@/components/common/Button";
+import Button from "@/components/common/Button";
 
 export default function Dashboard() {
   const { logout, state } = useAuth();
