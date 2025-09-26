@@ -1,9 +1,10 @@
 "use client";
 
-import {
+import React, {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useState,
   ReactNode,
 } from "react";
@@ -25,18 +26,18 @@ interface ThemeProviderProps {
 
 export const ThemeProvider = ({
   children,
-  defaultTheme = "light",
+  defaultTheme = "dark", // Default to dark for better loading experience
 }: ThemeProviderProps) => {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
 
-  // Apply theme to document on mount and when theme changes
-  useEffect(() => {
+  // Apply theme immediately on component mount
+  useLayoutEffect(() => {
     const root = document.documentElement;
 
-    if (theme === "dark") {
-      root.setAttribute("data-theme", "dark");
+    if (theme === "light") {
+      root.setAttribute("data-theme", "light");
     } else {
-      root.removeAttribute("data-theme");
+      root.removeAttribute("data-theme"); // Default to dark
     }
   }, [theme]);
 
@@ -48,7 +49,8 @@ export const ThemeProvider = ({
       if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
         setTheme(savedTheme);
       } else {
-        setTheme(defaultTheme);
+        // Default to dark theme for better loading experience since most routes start dark
+        setTheme("dark");
       }
     }
   }, [defaultTheme]);

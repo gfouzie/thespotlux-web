@@ -16,22 +16,22 @@
   --component-col-dark: #626060;
 }
 
-/* Default Light Mode */
+/* Default Dark Mode (since app defaults to dark) */
 :root {
-  --bg-col: var(--bg-col-light);
-  --text-col: var(--text-col-light);
-  --accent-col: var(--accent-col-light);
-  --card-col: var(--card-col-light);
-  --component-col: var(--component-col-light);
-}
-
-/* Dark Mode (applied via data-theme="dark" on html/body) */
-[data-theme="dark"] {
   --bg-col: var(--bg-col-dark);
   --text-col: var(--text-col-dark);
   --accent-col: var(--accent-col-dark);
   --card-col: var(--card-col-dark);
   --component-col: var(--component-col-dark);
+}
+
+/* Light Mode (applied via data-theme="light" on html/body) */
+[data-theme="light"] {
+  --bg-col: var(--bg-col-light);
+  --text-col: var(--text-col-light);
+  --accent-col: var(--accent-col-light);
+  --card-col: var(--card-col-light);
+  --component-col: var(--component-col-light);
 }
 
 @theme inline {

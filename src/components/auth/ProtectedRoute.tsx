@@ -3,6 +3,7 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect, ReactNode } from "react";
+import LoadingState from "@/components/common/LoadingState";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -23,14 +24,7 @@ export const ProtectedRoute = ({
   }, [state.isLoading, state.isAuthenticated, router, redirectTo]);
 
   if (state.isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg-col text-text-col">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-accent-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!state.isAuthenticated) {
@@ -59,14 +53,7 @@ export const PublicRoute = ({
   }, [state.isLoading, state.isAuthenticated, router, redirectTo]);
 
   if (state.isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-bg-col text-text-col">
-        <div className="text-center">
-          <div className="w-8 h-8 border-2 border-accent-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (state.isAuthenticated) {
