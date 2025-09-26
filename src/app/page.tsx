@@ -1,31 +1,22 @@
 "use client";
 
-import { ProtectedRoute, PublicRoute } from "@/components/auth/ProtectedRoute";
 import LandingPage from "@/components/landing";
 import Dashboard from "@/components/dashboard";
-import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
 
 export default function Home() {
-  const { setTheme } = useTheme();
   const { state } = useAuth();
 
-  // Set theme based on auth status
-  useEffect(() => {
-    if (!state.loading) {
-      setTheme(state.isAuthenticated ? "light" : "dark");
-    }
-  }, [state.isAuthenticated, state.loading, setTheme]);
+  if (state.isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-bg-col text-text-col">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-accent-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <>
-      <PublicRoute>
-        <LandingPage />
-      </PublicRoute>
-      <ProtectedRoute redirectTo="/login">
-        <Dashboard />
-      </ProtectedRoute>
-    </>
-  );
+  return state.isAuthenticated ? <Dashboard /> : <LandingPage />;
 }
