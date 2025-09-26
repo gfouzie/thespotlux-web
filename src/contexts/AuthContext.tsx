@@ -70,6 +70,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         accessToken: action.token,
         isAuthenticated: true,
+        isLoading: false,
         error: null,
       };
     default:
