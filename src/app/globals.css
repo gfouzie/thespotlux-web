@@ -1,17 +1,46 @@
 @import "tailwindcss";
 
 :root {
-  /* Custom Spotlux Theme Colors */
-  --bg-col: #000000; /* Black background */
-  --text-col: #ffffff; /* White text */
-  --primary-col: #ffff00; /* Yellow primary */
+  /* Light Mode Colors */
+  --bg-col-light: #efefef;
+  --text-col-light: 343434;
+  --accent-col-light: #ffc300;
+  --card-col-light: #fffcfc;
+  --component-col-light: #d3cfcf;
+
+  /* Dark Mode Colors */
+  --bg-col-dark: #212121;
+  --text-col-dark: #fffcfc;
+  --accent-col-dark: #f3c738;
+  --card-col-dark: #343434;
+  --component-col-dark: #626060;
+}
+
+/* Default Light Mode */
+:root {
+  --bg-col: var(--bg-col-light);
+  --text-col: var(--text-col-light);
+  --accent-col: var(--accent-col-light);
+  --card-col: var(--card-col-light);
+  --component-col: var(--component-col-light);
+}
+
+/* Dark Mode (applied via data-theme="dark" on html/body) */
+[data-theme="dark"] {
+  --bg-col: var(--bg-col-dark);
+  --text-col: var(--text-col-dark);
+  --accent-col: var(--accent-col-dark);
+  --card-col: var(--card-col-dark);
+  --component-col: var(--component-col-dark);
 }
 
 @theme inline {
   /* Custom color utilities */
   --color-bg-col: var(--bg-col);
   --color-text-col: var(--text-col);
-  --color-primary-col: var(--primary-col);
+  --color-accent-col: var(--accent-col);
+  --color-card-col: var(--card-col);
+  --color-component-col: var(--component-col);
 
   /* Font settings */
   --font-sans: var(--font-geist-sans);

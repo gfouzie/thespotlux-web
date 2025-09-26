@@ -113,7 +113,7 @@ const LoginPage = () => {
             Don't have an account?{" "}
             <Link
               href="/register"
-              className="text-primary-col hover:text-primary-col/80 font-medium transition-colors"
+              className="text-accent-col hover:text-accent-col/80 font-medium transition-colors"
             >
               Sign up
             </Link>

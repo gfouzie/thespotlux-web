@@ -47,9 +47,9 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // Variant styles
     const variantStyles = {
       primary: cn(
-        "bg-primary-col text-bg-col",
-        "hover:bg-primary-col/90 focus:ring-primary-col",
-        "disabled:bg-primary-col/50"
+        "bg-accent-col text-bg-col",
+        "hover:bg-accent-col/90 focus:ring-accent-col",
+        "disabled:bg-accent-col/50"
       ),
       secondary: cn(
         "bg-text-col/10 text-text-col border border-text-col/30",

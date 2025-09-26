@@ -2,11 +2,14 @@
 
 import LoginPage from "@/components/login";
 import { PublicRoute } from "@/components/auth/ProtectedRoute";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export default function Login() {
   return (
-    <PublicRoute redirectTo="/">
-      <LoginPage />
-    </PublicRoute>
+    <ThemeProvider defaultTheme="dark">
+      <PublicRoute redirectTo="/">
+        <LoginPage />
+      </PublicRoute>
+    </ThemeProvider>
   );
 }

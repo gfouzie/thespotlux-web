@@ -30,6 +30,6 @@
 }
 
 .spotlux-input:focus:-webkit-autofill {
-  box-shadow: 0 0 0 2px var(--primary-col) !important;
-  -webkit-box-shadow: 0 0 0 2px var(--primary-col) !important;
+  box-shadow: 0 0 0 2px var(--accent-col) !important;
+  -webkit-box-shadow: 0 0 0 2px var(--accent-col) !important;
 }

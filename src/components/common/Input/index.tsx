@@ -64,7 +64,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               "w-full px-4 py-3 rounded-lg transition-all duration-200",
               "bg-text-col/10 border border-text-col/30",
               "text-text-col placeholder-text-col/50",
-              "focus:outline-none focus:ring-2 focus:ring-primary-col focus:border-transparent",
+              "focus:outline-none focus:ring-2 focus:ring-accent-col focus:border-transparent",
 
               // Icon padding
               icon && "pl-10",

@@ -8,7 +8,7 @@ export default function LandingPage() {
       <section className="flex-1 flex items-center justify-center px-6 lg:px-12 py-16">
         <div className="max-w-4xl text-center">
           <h1 className="text-5xl lg:text-7xl font-bold mb-6">
-            Shine Your <span className="text-primary-col">Spotlight</span>
+            Shine Your <span className="text-accent-col">Spotlight</span>
           </h1>
           <p className="text-xl lg:text-2xl text-text-col/80 mb-8 max-w-2xl mx-auto">
             The professional platform where athletes showcase their best clips
@@ -32,14 +32,14 @@ export default function LandingPage() {
       <section className="py-16 px-6 lg:px-12">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">
-            Built for <span className="text-primary-col">Athletes</span> &{" "}
-            <span className="text-primary-col">Scouts</span>
+            Built for <span className="text-accent-col">Athletes</span> &{" "}
+            <span className="text-accent-col">Scouts</span>
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-primary-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-col text-2xl">🎬</span>
+              <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-accent-col text-2xl">🎬</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Showcase Highlights
@@ -51,8 +51,8 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-12 h-12 bg-primary-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-col text-2xl">🔍</span>
+              <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-accent-col text-2xl">🔍</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">Get Discovered</h3>
               <p className="text-text-col/70">
@@ -62,8 +62,8 @@ export default function LandingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-12 h-12 bg-primary-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-col text-2xl">⚡</span>
+              <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-accent-col text-2xl">⚡</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">Stand Out</h3>
               <p className="text-text-col/70">

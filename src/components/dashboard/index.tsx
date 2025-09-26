@@ -1,11 +1,13 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { useState } from "react";
 import { Button } from "@/components/common/Button";
 
 export default function Dashboard() {
   const { logout, state } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
@@ -37,7 +39,16 @@ export default function Dashboard() {
           </p>
         </div>
 
-        <div className="pt-8">
+        <div className="pt-8 space-y-4">
+          <Button
+            onClick={toggleTheme}
+            variant="secondary"
+            size="md"
+            className="w-full"
+          >
+            Switch to {theme === "light" ? "Dark" : "Light"} Mode
+          </Button>
+
           <Button
             onClick={handleLogout}
             variant="danger"

@@ -26,7 +26,7 @@ export const ProtectedRoute = ({
     return (
       <div className="flex items-center justify-center min-h-screen bg-bg-col text-text-col">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-2 border-accent-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p>Loading...</p>
         </div>
       </div>
@@ -62,7 +62,7 @@ export const PublicRoute = ({
     return (
       <div className="flex items-center justify-center min-h-screen bg-bg-col text-text-col">
         <div className="text-center">
-          <div className="w-8 h-8 border-2 border-primary-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-8 h-8 border-2 border-accent-col border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p>Loading...</p>
         </div>
       </div>

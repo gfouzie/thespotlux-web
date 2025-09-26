@@ -2,11 +2,14 @@
 
 import RegisterPage from "@/components/register";
 import { PublicRoute } from "@/components/auth/ProtectedRoute";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 
 export default function Register() {
   return (
-    <PublicRoute redirectTo="/">
-      <RegisterPage />
-    </PublicRoute>
+    <ThemeProvider defaultTheme="dark">
+      <PublicRoute redirectTo="/">
+        <RegisterPage />
+      </PublicRoute>
+    </ThemeProvider>
   );
 }
