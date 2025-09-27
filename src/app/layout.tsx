@@ -26,6 +26,9 @@ const martelSans = Martel_Sans({
 export const metadata: Metadata = {
   title: "The Spotlux",
   description: "Shining on the future",
+  icons: {
+    icon: "/thespotlux_favicon.ico",
+  },
 };
 
 export default function RootLayout({
@@ -35,6 +38,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/thespotlux_favicon.ico" />
+        <link rel="shortcut icon" href="/thespotlux_favicon.ico" />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${martelSans.variable} antialiased bg-bg-col text-text-col min-h-screen flex flex-col`}
       >
