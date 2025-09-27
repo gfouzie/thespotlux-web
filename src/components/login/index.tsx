@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { ApiError } from "@/api";
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input/index";
+import AuthFormContainer from "@/components/auth/AuthFormContainer";
 
 interface LoginFormData {
   email: string;
@@ -24,13 +22,7 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
-  const { theme } = useTheme();
   const router = useRouter();
-
-  const logoSrc =
-    theme === "light"
-      ? "/thespotlux_logo_light.png"
-      : "/thespotlux_logo_dark.png";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,90 +58,65 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center py-16">
-      <div className="w-full max-w-md relative">
-        <div className="flex justify-center mb-8">
-          <Image
-            src={logoSrc}
-            alt="Spotlux Logo"
-            width={600}
-            height={150}
-            className="object-contain"
-            priority
-          />
+    <AuthFormContainer
+      footerText="Don't have an account?"
+      footerLinkText="Sign up"
+      footerLinkHref="/register"
+    >
+      {error && (
+        <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-4">
+          {error}
         </div>
-        <h3 className="text-2xl mb-2 text-center">SHINING ON THE FUTURE</h3>
+      )}
 
-        {error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 -translate-y-8 w-[640px] h-8 bg-text-col/70 z-10 spotlight-oval" />
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-4 bg-card-col px-4 py-6 rounded-md relative z-20"
-        >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="email"
+          name="email"
+          type="email"
+          label="Email"
+          placeholder="your@email.com"
+          value={formData.email}
+          onChange={handleInputChange}
+          required
+        />
+
+        <div>
           <Input
-            id="email"
-            name="email"
-            type="email"
-            label="Email"
-            placeholder="your@email.com"
-            value={formData.email}
+            id="password"
+            name="password"
+            type="password"
+            label="Password"
+            placeholder="Enter your password"
+            value={formData.password}
             onChange={handleInputChange}
+            showPasswordToggle
             required
+            minLength={8}
           />
-
-          <div>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="Enter your password"
-              value={formData.password}
-              onChange={handleInputChange}
-              showPasswordToggle
-              required
-              minLength={8}
-            />
-            <div className="text-right mt-2">
-              <button
-                type="button"
-                onClick={() => console.log("Forgot password clicked")}
-                className="text-sm text-text-col hover:text-text-col/80 transition-colors cursor-pointer"
-              >
-                Forgot password?
-              </button>
-            </div>
-          </div>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="md"
-            isLoading={isLoading}
-            loadingText="Signing in..."
-            className="w-full"
-          >
-            Sign In
-          </Button>
-        </form>
-
-        <div className="mt-6 text-center">
-          <p className="text-text-col/70">
-            Don&apos;t have an account?{" "}
-            <Link
-              href="/register"
-              className="text-accent-col hover:text-accent-col/80 font-medium transition-colors"
+          <div className="text-right mt-2">
+            <button
+              type="button"
+              onClick={() => console.log("Forgot password clicked")}
+              className="text-sm text-text-col hover:text-text-col/80 transition-colors cursor-pointer"
             >
-              Sign up
-            </Link>
-          </p>
+              Forgot password?
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+
+        <Button
+          type="submit"
+          variant="primary"
+          size="md"
+          isLoading={isLoading}
+          loadingText="Signing in..."
+          className="w-full"
+        >
+          Sign In
+        </Button>
+      </form>
+    </AuthFormContainer>
   );
 };
 

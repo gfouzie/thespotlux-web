@@ -2,11 +2,11 @@
 
 import { useReducer } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { userApi, ApiError } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Input from "@/components/common/Input/index";
 import Button from "@/components/common/Button";
+import AuthFormContainer from "@/components/auth/AuthFormContainer";
 
 interface FormData {
   email: string;
@@ -120,107 +120,93 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center py-16">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold mb-2 text-center">Join Spotlux</h1>
-        <p className="text-text-col/70 text-center mb-8">
-          Get started with just your email and password - we'll collect more
-          details later
-        </p>
+    <AuthFormContainer
+      footerText="Already have an account?"
+      footerLinkText="Sign in"
+      footerLinkHref="/login"
+    >
+      {state.error && (
+        <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-4">
+          {state.error}
+        </div>
+      )}
 
-        {state.error && (
-          <div className="bg-red-500/20 border border-red-500 text-red-500 px-4 py-3 rounded-lg mb-4">
-            {state.error}
-          </div>
-        )}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <Input
+          id="email"
+          type="email"
+          label="Email"
+          placeholder="your@email.com"
+          value={state.formData.email}
+          onChange={(e) =>
+            dispatch({
+              type: "UPDATE_FIELD",
+              field: "email",
+              value: e.target.value,
+            })
+          }
+          required
+        />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
           <Input
-            id="email"
-            type="email"
-            label="Email"
-            placeholder="your@email.com"
-            value={state.formData.email}
-            onChange={(e) =>
-              dispatch({
-                type: "UPDATE_FIELD",
-                field: "email",
-                value: e.target.value,
-              })
-            }
-            required
-          />
-
-          <div>
-            <Input
-              id="password"
-              type="password"
-              label="Password"
-              placeholder="Create a secure password"
-              value={state.formData.password}
-              onChange={(e) =>
-                dispatch({
-                  type: "UPDATE_FIELD",
-                  field: "password",
-                  value: e.target.value,
-                })
-              }
-              showPasswordToggle
-              required
-              minLength={8}
-            />
-            <p className="text-text-col/60 text-xs mt-1">
-              Minimum 8 characters with complexity requirements
-            </p>
-          </div>
-
-          <Input
-            id="confirmPassword"
+            id="password"
             type="password"
-            label="Confirm Password"
-            placeholder="Confirm your password"
-            value={state.formData.confirmPassword}
+            label="Password"
+            placeholder="Create a secure password"
+            value={state.formData.password}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
-                field: "confirmPassword",
+                field: "password",
                 value: e.target.value,
               })
             }
             showPasswordToggle
             required
             minLength={8}
-            error={
-              state.hasAttemptedSubmit &&
-              state.formData.confirmPassword &&
-              state.formData.password !== state.formData.confirmPassword
-                ? "Passwords do not match"
-                : undefined
-            }
           />
+          <p className="text-text-col/60 text-xs mt-1">
+            Minimum 8 characters with complexity requirements
+          </p>
+        </div>
 
-          <Button
-            type="submit"
-            variant="primary"
-            size="md"
-            isLoading={state.loading}
-            loadingText="Creating Account..."
-            className="w-full"
-          >
-            Create Account
-          </Button>
-        </form>
+        <Input
+          id="confirmPassword"
+          type="password"
+          label="Confirm Password"
+          placeholder="Confirm your password"
+          value={state.formData.confirmPassword}
+          onChange={(e) =>
+            dispatch({
+              type: "UPDATE_FIELD",
+              field: "confirmPassword",
+              value: e.target.value,
+            })
+          }
+          showPasswordToggle
+          required
+          minLength={8}
+          error={
+            state.hasAttemptedSubmit &&
+            state.formData.confirmPassword &&
+            state.formData.password !== state.formData.confirmPassword
+              ? "Passwords do not match"
+              : undefined
+          }
+        />
 
-        <p className="text-center mt-6 text-text-col/70">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-accent-col hover:underline font-medium"
-          >
-            Sign in
-          </Link>
-        </p>
-      </div>
-    </div>
+        <Button
+          type="submit"
+          variant="primary"
+          size="md"
+          isLoading={state.loading}
+          loadingText="Creating Account..."
+          className="w-full"
+        >
+          Create Account
+        </Button>
+      </form>
+    </AuthFormContainer>
   );
 }
