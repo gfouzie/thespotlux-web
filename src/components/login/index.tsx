@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { ApiError } from "@/api";
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input/index";
@@ -23,7 +24,13 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { login } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
+
+  const logoSrc =
+    theme === "light"
+      ? "/thespotlux_logo_light.png"
+      : "/thespotlux_logo_dark.png";
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -63,7 +70,7 @@ const LoginPage = () => {
       <div className="w-full max-w-md relative">
         <div className="flex justify-center mb-8">
           <Image
-            src="/thespotlux_logo.png"
+            src={logoSrc}
             alt="Spotlux Logo"
             width={600}
             height={150}

@@ -3,12 +3,19 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import Button from "@/components/common/Button";
 import { useState } from "react";
 
 export default function LoggedInHeader() {
   const { logout } = useAuth();
+  const { theme } = useTheme();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const logoSrc =
+    theme === "light"
+      ? "/thespotlux_logo_light.png"
+      : "/thespotlux_logo_dark.png";
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -23,7 +30,7 @@ export default function LoggedInHeader() {
     <header className="flex justify-between items-center p-6 lg:px-12 bg-bg-col text-text-col">
       <Link href="/" className="hover:opacity-80 transition-opacity">
         <Image
-          src="/thespotlux_logo.png"
+          src={logoSrc}
           alt="Spotlux Logo"
           width={180}
           height={45}

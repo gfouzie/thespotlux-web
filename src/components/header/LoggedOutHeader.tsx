@@ -1,12 +1,21 @@
 import Link from "next/link";
 import Image from "next/image";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function LoggedOutHeader() {
+  const { theme } = useTheme();
+
+  const logoSrc =
+    theme === "light"
+      ? "/thespotlux_logo_light.png"
+      : "/thespotlux_logo_dark.png";
+
+  console.log(logoSrc);
   return (
     <header className="flex justify-between items-center p-6 lg:px-12 bg-bg-col text-text-col">
       <Link href="/" className="hover:opacity-80 transition-opacity">
         <Image
-          src="/thespotlux_logo.png"
+          src={logoSrc}
           alt="Spotlux Logo"
           width={180}
           height={45}
