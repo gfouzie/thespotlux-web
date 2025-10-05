@@ -26,9 +26,10 @@ interface ThemeProviderProps {
 
 export const ThemeProvider = ({
   children,
-  defaultTheme = "dark", // Default to dark for better loading experience
+  defaultTheme = "light", // Default to light mode
 }: ThemeProviderProps) => {
   const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Apply theme immediately on component mount
   useLayoutEffect(() => {
@@ -37,30 +38,37 @@ export const ThemeProvider = ({
     if (theme === "light") {
       root.setAttribute("data-theme", "light");
     } else {
-      root.removeAttribute("data-theme"); // Default to dark
+      root.setAttribute("data-theme", "dark");
     }
   }, [theme]);
 
-  // Initialize theme on mount (can check localStorage if you want persistence)
+  // Handle hydration and sync with localStorage
   useEffect(() => {
-    // Prevent hydration mismatch by only reading localStorage on client
-    if (typeof window !== "undefined") {
+    setIsHydrated(true);
+
+    // Check what theme was set by the inline script
+    const currentTheme = document.documentElement.getAttribute(
+      "data-theme"
+    ) as Theme;
+    if (currentTheme && (currentTheme === "light" || currentTheme === "dark")) {
+      setTheme(currentTheme);
+    } else {
+      // Fallback to localStorage or defaultTheme
       const savedTheme = localStorage.getItem("spotlux-theme") as Theme;
       if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
         setTheme(savedTheme);
       } else {
-        // Default to dark theme for better loading experience since most routes start dark
-        setTheme("dark");
+        setTheme(defaultTheme);
       }
     }
   }, [defaultTheme]);
 
-  // Save theme to localStorage when it changes
+  // Save theme to localStorage when it changes (only after hydration)
   useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (isHydrated) {
       localStorage.setItem("spotlux-theme", theme);
     }
-  }, [theme]);
+  }, [theme, isHydrated]);
 
   const toggleTheme = () => {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));

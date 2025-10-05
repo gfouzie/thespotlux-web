@@ -21,6 +21,7 @@ export interface User {
   username: string;
   email: string;
   profile_image_url: string;
+  uuid: string;
   role_id: number | null;
 }
 
@@ -62,5 +63,14 @@ export const userApi = {
     default_role: number;
   }> => {
     return apiRequest(`${config.apiBaseUrl}/api/v1/roles`);
+  },
+
+  /**
+   * Get user by username (convenience endpoint)
+   */
+  getUserByUsername: async (username: string): Promise<User> => {
+    return apiRequest<User>(
+      `${config.apiBaseUrl}/api/v1/user/by-username/${username}`
+    );
   },
 };

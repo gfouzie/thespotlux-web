@@ -37,15 +37,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/thespotlux_favicon.ico" />
         <link rel="shortcut icon" href="/thespotlux_favicon.ico" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              try {
+                const theme = localStorage.getItem('spotlux-theme');
+                if (theme === 'light' || theme === 'dark') {
+                  document.documentElement.setAttribute('data-theme', theme);
+                } else {
+                  document.documentElement.setAttribute('data-theme', 'light');
+                }
+              } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'light');
+              }
+            `,
+          }}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${martelSans.variable} antialiased bg-bg-col text-text-col min-h-screen flex flex-col`}
       >
-        <ThemeProvider defaultTheme="dark">
+        <ThemeProvider defaultTheme="light">
           <AuthProvider>
             <Header />
             <main className="flex-1">{children}</main>
