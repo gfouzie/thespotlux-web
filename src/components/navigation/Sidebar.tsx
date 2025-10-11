@@ -73,7 +73,6 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
     { name: "Search", href: "/search", icon: Search },
     { name: "Profile", href: "/profile", icon: User },
     { name: "Messages", href: "/messages", icon: ChatBubble },
-    { name: "Settings", href: "/settings", icon: Settings },
   ];
 
   const isActive = (href: string) => {
@@ -105,7 +104,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
 
   return (
     <div
-      className={`bg-bg-col/80 backdrop-blur-sm border-r border-text-col/20 h-full flex flex-col transition-all duration-300 relative ${
+      className={`bg-bg-col/80 backdrop-blur-sm border-r border-text-col/20 h-screen flex flex-col transition-all duration-300 relative sticky top-0 ${
         isCollapsed ? "w-24" : "w-64"
       } ${className}`}
     >
@@ -147,6 +146,10 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-text-col/20 space-y-2">
+        <NavItem
+          item={{ name: "Settings", href: "/settings", icon: Settings }}
+        />
+
         <button
           onClick={handleLogout}
           className={`w-full flex items-center px-4 py-3 rounded-lg group cursor-pointer ${
