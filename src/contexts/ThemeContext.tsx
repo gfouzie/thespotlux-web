@@ -28,7 +28,16 @@ export const ThemeProvider = ({
   children,
   defaultTheme = "light", // Default to light mode
 }: ThemeProviderProps) => {
-  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  // Initialize theme from DOM data-theme attribute (set by inline script)
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === "undefined") return defaultTheme;
+    const domTheme = document.documentElement.getAttribute(
+      "data-theme"
+    ) as Theme;
+    return domTheme === "light" || domTheme === "dark"
+      ? domTheme
+      : defaultTheme;
+  });
   const [isHydrated, setIsHydrated] = useState(false);
 
   // Apply theme immediately on component mount
@@ -42,26 +51,10 @@ export const ThemeProvider = ({
     }
   }, [theme]);
 
-  // Handle hydration and sync with localStorage
+  // Handle hydration
   useEffect(() => {
     setIsHydrated(true);
-
-    // Check what theme was set by the inline script
-    const currentTheme = document.documentElement.getAttribute(
-      "data-theme"
-    ) as Theme;
-    if (currentTheme && (currentTheme === "light" || currentTheme === "dark")) {
-      setTheme(currentTheme);
-    } else {
-      // Fallback to localStorage or defaultTheme
-      const savedTheme = localStorage.getItem("spotlux-theme") as Theme;
-      if (savedTheme && (savedTheme === "light" || savedTheme === "dark")) {
-        setTheme(savedTheme);
-      } else {
-        setTheme(defaultTheme);
-      }
-    }
-  }, [defaultTheme]);
+  }, []);
 
   // Save theme to localStorage when it changes (only after hydration)
   useEffect(() => {
