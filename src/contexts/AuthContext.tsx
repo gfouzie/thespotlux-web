@@ -28,7 +28,7 @@ type AuthAction =
 
 // Auth context interface
 interface AuthContextType {
-  state: AuthState;
+  authState: AuthState;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   setAccessToken: (token: string) => void;
@@ -154,7 +154,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [state.isAuthenticated]);
 
   const value: AuthContextType = {
-    state,
+    authState: state,
     login,
     logout,
     setAccessToken,

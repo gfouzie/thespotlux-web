@@ -5,9 +5,9 @@ import LoggedInHeader from "./LoggedInHeader";
 import LoggedOutHeader from "./LoggedOutHeader";
 
 export default function Header() {
-  const { state } = useAuth();
+  const { authState } = useAuth();
 
-  if (state.isLoading) {
+  if (authState.isLoading) {
     return (
       <header className="flex justify-between items-center p-6 lg:px-12 bg-bg-col text-text-col">
         <div className="w-[180px] h-[45px] bg-text-col/10 rounded animate-pulse"></div>
@@ -19,5 +19,5 @@ export default function Header() {
     );
   }
 
-  return state.isAuthenticated ? <LoggedInHeader /> : <LoggedOutHeader />;
+  return authState.isAuthenticated ? <LoggedInHeader /> : <LoggedOutHeader />;
 }

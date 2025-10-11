@@ -23,7 +23,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ className = "" }: SidebarProps) => {
-  const { state, logout } = useAuth();
+  const { authState, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { theme } = useTheme();
@@ -71,8 +71,9 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
   const navigationItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Search", href: "/search", icon: Search },
-    { name: "Messages", href: "/messages", icon: ChatBubble },
     { name: "Profile", href: "/profile", icon: User },
+    { name: "Messages", href: "/messages", icon: ChatBubble },
+    { name: "Settings", href: "/settings", icon: Settings },
   ];
 
   const isActive = (href: string) => {
@@ -82,7 +83,23 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
     return pathname.startsWith(href);
   };
 
-  if (!state.isAuthenticated) {
+  // Reusable navigation item component
+  const NavItem = ({ item }: { item: (typeof navigationItems)[0] }) => (
+    <Link
+      href={item.href}
+      className={`flex items-center px-4 py-3 rounded-lg group ${
+        isActive(item.href)
+          ? "border-l-4 border-accent-col bg-bg-col/30"
+          : "hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
+      } ${!isCollapsed ? "space-x-3" : "justify-center"} text-text-col`}
+      title={isCollapsed ? item.name : undefined}
+    >
+      <Icon icon={item.icon} width={24} height={24} />
+      {!isCollapsed && <span className="font-medium">{item.name}</span>}
+    </Link>
+  );
+
+  if (!authState.isAuthenticated) {
     return null;
   }
 
@@ -124,40 +141,15 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
       {/* Main Navigation */}
       <nav className="flex-1 p-4 space-y-2">
         {navigationItems.map((item) => (
-          <Link
-            key={item.name}
-            href={item.href}
-            className={`flex items-center px-4 py-3 rounded-lg transition-colors group ${
-              isActive(item.href)
-                ? "border-l-4 border-accent-col bg-bg-col/30"
-                : "text-text-col hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
-            } ${!isCollapsed ? "space-x-3" : "justify-center"}`}
-            title={isCollapsed ? item.name : undefined}
-          >
-            <Icon icon={item.icon} width={24} height={24} />
-            {!isCollapsed && <span className="font-medium">{item.name}</span>}
-          </Link>
+          <NavItem key={item.name} item={item} />
         ))}
       </nav>
 
       {/* Bottom Section */}
       <div className="p-4 border-t border-text-col/20 space-y-2">
-        <Link
-          href="/settings"
-          className={`flex items-center px-4 py-3 rounded-lg transition-colors group ${
-            isActive("/settings")
-              ? "border-l-4 border-accent-col bg-bg-col/30"
-              : "text-text-col hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
-          } ${!isCollapsed ? "space-x-3" : "justify-center"}`}
-          title={isCollapsed ? "Settings" : undefined}
-        >
-          <Icon icon={Settings} width={24} height={24} />
-          {!isCollapsed && <span className="font-medium">Settings</span>}
-        </Link>
-
         <button
           onClick={handleLogout}
-          className={`w-full flex items-center px-4 py-3 rounded-lg transition-colors group cursor-pointer ${
+          className={`w-full flex items-center px-4 py-3 rounded-lg group cursor-pointer ${
             !isCollapsed ? "space-x-3" : "justify-center"
           } text-text-col hover:bg-bg-col/50 hover:border-l-4 hover:border-red-500/50`}
           title={isCollapsed ? "Logout" : undefined}

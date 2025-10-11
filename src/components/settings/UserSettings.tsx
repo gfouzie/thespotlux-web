@@ -16,10 +16,10 @@ interface UserSettingsProps {
 }
 
 const UserSettings = ({ user }: UserSettingsProps) => {
-  const { state } = useAuth();
+  const { authState } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
-  if (!state.isAuthenticated) {
+  if (!authState.isAuthenticated) {
     return (
       <div className="p-6 text-center">
         <p className="text-text-col/70">Please log in to view settings.</p>

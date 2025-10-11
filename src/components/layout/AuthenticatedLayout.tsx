@@ -11,16 +11,16 @@ interface AuthenticatedLayoutProps {
 }
 
 const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
-  const { state } = useAuth();
+  const { authState } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!state.isAuthenticated) {
+    if (!authState.isAuthenticated) {
       router.push("/login");
     }
-  }, [state.isAuthenticated, router]);
+  }, [authState.isAuthenticated, router]);
 
-  if (!state.isAuthenticated) {
+  if (!authState.isAuthenticated) {
     return <LoadingState />;
   }
 
