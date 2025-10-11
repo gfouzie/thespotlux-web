@@ -71,8 +71,8 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
   const navigationItems = [
     { name: "Home", href: "/", icon: Home },
     { name: "Search", href: "/search", icon: Search },
-    { name: "Profile", href: "/profile", icon: User },
     { name: "Messages", href: "/messages", icon: ChatBubble },
+    { name: "Profile", href: "/profile", icon: User },
   ];
 
   const isActive = (href: string) => {
