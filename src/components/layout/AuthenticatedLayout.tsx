@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Sidebar from "@/components/navigation/Sidebar";
+import MobileNav from "@/components/navigation/MobileNav";
 import LoadingState from "@/components/common/LoadingState";
 
 interface AuthenticatedLayoutProps {
@@ -25,14 +26,21 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-bg-col flex">
-      {/* Sidebar */}
-      <div className="flex-shrink-0">
+    <div className="min-h-screen bg-bg-col flex flex-col lg:flex-row">
+      {/* Desktop Sidebar */}
+      <div className="hidden lg:block flex-shrink-0">
         <Sidebar />
       </div>
 
+      {/* Mobile Navigation */}
+      <div className="lg:hidden">
+        <MobileNav />
+      </div>
+
       {/* Page Content */}
-      <div className="flex-1 overflow-auto">{children}</div>
+      <div className="flex-1 overflow-auto lg:pt-0 pt-0 pb-20 lg:pb-0">
+        {children}
+      </div>
     </div>
   );
 };

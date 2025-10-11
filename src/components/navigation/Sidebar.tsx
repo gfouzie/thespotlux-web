@@ -6,17 +6,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
-import {
-  Home,
-  Search,
-  User,
-  ChatBubble,
-  Settings,
-  LogOut,
-  ArrowLeft,
-  ArrowRight,
-} from "iconoir-react";
+import { Settings, LogOut, ArrowLeft, ArrowRight } from "iconoir-react";
 import Icon from "@/components/common/Icon";
+import { navigationItems } from "@/constants/navigation";
 
 interface SidebarProps {
   className?: string;
@@ -67,13 +59,6 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
       console.error("Logout failed:", error);
     }
   };
-
-  const navigationItems = [
-    { name: "Home", href: "/", icon: Home },
-    { name: "Search", href: "/search", icon: Search },
-    { name: "Profile", href: "/profile", icon: User },
-    { name: "Messages", href: "/messages", icon: ChatBubble },
-  ];
 
   const isActive = (href: string) => {
     if (href === "/") {
