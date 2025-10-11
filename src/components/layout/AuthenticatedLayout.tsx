@@ -15,12 +15,12 @@ const AuthenticatedLayout = ({ children }: AuthenticatedLayoutProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authState.isAuthenticated) {
+    if (!authState.isLoading && !authState.isAuthenticated) {
       router.push("/login");
     }
-  }, [authState.isAuthenticated, router]);
+  }, [authState.isLoading, authState.isAuthenticated, router]);
 
-  if (!authState.isAuthenticated) {
+  if (authState.isLoading || !authState.isAuthenticated) {
     return <LoadingState />;
   }
 
