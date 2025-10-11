@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import Button from "@/components/common/Button";
 
 interface UserSettingsProps {
@@ -16,6 +17,7 @@ interface UserSettingsProps {
 
 const UserSettings = ({ user }: UserSettingsProps) => {
   const { state } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   if (!state.isAuthenticated) {
     return (
@@ -64,6 +66,25 @@ const UserSettings = ({ user }: UserSettingsProps) => {
                 ? `${user.first_name} ${user.last_name}`
                 : "Not provided"}
             </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Appearance Settings */}
+      <div className="bg-bg-col/50 backdrop-blur-sm rounded-xl border border-text-col/20 p-6">
+        <h3 className="text-lg font-medium text-text-col mb-4">Appearance</h3>
+
+        <div className="space-y-3">
+          <div className="flex justify-between items-center py-2">
+            <div>
+              <span className="text-sm font-medium text-text-col">Theme</span>
+              <p className="text-xs text-text-col/60">
+                Switch between light and dark mode
+              </p>
+            </div>
+            <Button onClick={toggleTheme} variant="secondary" size="sm">
+              Switch to {theme === "light" ? "Dark" : "Light"} Mode
+            </Button>
           </div>
         </div>
       </div>

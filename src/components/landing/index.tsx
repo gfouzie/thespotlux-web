@@ -1,5 +1,7 @@
 import Link from "next/link";
 import Button from "@/components/common/Button";
+import Icon from "@/components/common/Icon";
+import { Play, Search, Star } from "iconoir-react";
 
 export default function LandingPage() {
   return (
@@ -39,7 +41,12 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-accent-col text-2xl">🎬</span>
+                <Icon
+                  icon={Play}
+                  width={24}
+                  height={24}
+                  className="text-accent-col"
+                />
               </div>
               <h3 className="text-xl font-semibold mb-2">
                 Showcase Highlights
@@ -52,7 +59,12 @@ export default function LandingPage() {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-accent-col text-2xl">🔍</span>
+                <Icon
+                  icon={Search}
+                  width={24}
+                  height={24}
+                  className="text-accent-col"
+                />
               </div>
               <h3 className="text-xl font-semibold mb-2">Get Discovered</h3>
               <p className="text-text-col/70">
@@ -63,7 +75,12 @@ export default function LandingPage() {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <span className="text-accent-col text-2xl">⚡</span>
+                <Icon
+                  icon={Star}
+                  width={24}
+                  height={24}
+                  className="text-accent-col"
+                />
               </div>
               <h3 className="text-xl font-semibold mb-2">Stand Out</h3>
               <p className="text-text-col/70">

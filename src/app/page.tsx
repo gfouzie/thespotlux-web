@@ -3,6 +3,8 @@
 import LandingPage from "@/components/landing";
 import Dashboard from "@/components/dashboard";
 import LoadingState from "@/components/common/LoadingState";
+import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
+import UnauthenticatedLayout from "@/components/layout/UnauthenticatedLayout";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
@@ -12,5 +14,17 @@ export default function Home() {
     return <LoadingState />;
   }
 
-  return state.isAuthenticated ? <Dashboard /> : <LandingPage />;
+  if (state.isAuthenticated) {
+    return (
+      <AuthenticatedLayout>
+        <Dashboard />
+      </AuthenticatedLayout>
+    );
+  }
+
+  return (
+    <UnauthenticatedLayout>
+      <LandingPage />
+    </UnauthenticatedLayout>
+  );
 }

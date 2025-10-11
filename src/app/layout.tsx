@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Martel_Sans } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 
@@ -59,14 +57,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${martelSans.variable} antialiased bg-bg-col text-text-col min-h-screen flex flex-col`}
+        className={`${geistSans.variable} ${geistMono.variable} ${martelSans.variable} antialiased bg-bg-col text-text-col`}
       >
         <ThemeProvider defaultTheme="light">
-          <AuthProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </AuthProvider>
+          <AuthProvider>{children}</AuthProvider>
         </ThemeProvider>
       </body>
     </html>

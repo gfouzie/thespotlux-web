@@ -1,10 +1,10 @@
 import RegisterPage from "@/components/register";
-import { PublicRoute } from "@/components/auth/ProtectedRoute";
+import UnauthenticatedLayout from "@/components/layout/UnauthenticatedLayout";
 
 export default function Register() {
   return (
-    <PublicRoute redirectTo="/">
+    <UnauthenticatedLayout>
       <RegisterPage />
-    </PublicRoute>
+    </UnauthenticatedLayout>
   );
 }

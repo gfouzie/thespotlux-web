@@ -1,10 +1,10 @@
 import LoginPage from "@/components/login";
-import { PublicRoute } from "@/components/auth/ProtectedRoute";
+import UnauthenticatedLayout from "@/components/layout/UnauthenticatedLayout";
 
 export default function Login() {
   return (
-    <PublicRoute redirectTo="/">
+    <UnauthenticatedLayout>
       <LoginPage />
-    </PublicRoute>
+    </UnauthenticatedLayout>
   );
 }
