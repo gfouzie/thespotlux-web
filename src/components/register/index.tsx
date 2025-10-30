@@ -9,6 +9,8 @@ import Button from "@/components/common/Button";
 import AuthFormContainer from "@/components/auth/AuthFormContainer";
 
 interface FormData {
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -31,6 +33,8 @@ type Action =
 // Initial state
 const initialState: State = {
   formData: {
+    first_name: "",
+    last_name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -77,6 +81,19 @@ export default function RegisterPage() {
     dispatch({ type: "SET_LOADING", loading: true });
 
     try {
+      // Validate first/last name contain only letters
+      const namePattern = /^[A-Za-z]{2,30}$/;
+      if (
+        !namePattern.test(state.formData.first_name) ||
+        !namePattern.test(state.formData.last_name)
+      ) {
+        dispatch({
+          type: "SET_ERROR",
+          error: "First and last name must be letters only (2-30).",
+        });
+        return;
+      }
+
       // Check if passwords match
       if (state.formData.password !== state.formData.confirmPassword) {
         dispatch({ type: "SET_ERROR", error: "Passwords do not match" });
@@ -132,6 +149,42 @@ export default function RegisterPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            id="first_name"
+            type="text"
+            label="First Name"
+            placeholder="First name"
+            value={state.formData.first_name}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "first_name",
+                value: e.target.value,
+              })
+            }
+            required
+            minLength={2}
+            maxLength={30}
+          />
+          <Input
+            id="last_name"
+            type="text"
+            label="Last Name"
+            placeholder="Last name"
+            value={state.formData.last_name}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "last_name",
+                value: e.target.value,
+              })
+            }
+            required
+            minLength={2}
+            maxLength={30}
+          />
+        </div>
         <Input
           id="email"
           type="email"

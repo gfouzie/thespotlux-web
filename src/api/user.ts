@@ -6,6 +6,8 @@ import { authApi, type LoginResponse } from "./auth";
  * User registration data interface
  */
 export interface RegisterUserData {
+  first_name: string;
+  last_name: string;
   username: string;
   email: string;
   password: string;
