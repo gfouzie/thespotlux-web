@@ -23,7 +23,6 @@ export interface User {
   username: string;
   email: string;
   profile_image_url: string;
-  uuid: string;
   role_id: number | null;
 }
 
