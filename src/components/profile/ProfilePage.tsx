@@ -1,11 +1,39 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import AboutSection from "@/components/profile/AboutSection";
+import ProfilePictureSection from "@/components/profile/ProfilePictureSection";
+import { profileApi } from "@/api/profile";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ProfilePage: React.FC = () => {
-  const [isEditMode, setIsEditMode] = useState(true); // Default to edit mode for owner
+  const { authState } = useAuth();
+  const [isEditMode, setIsEditMode] = useState(true);
+  const [profileImageUrl, setProfileImageUrl] = useState<string>("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!authState.accessToken) return;
+
+      try {
+        setLoading(true);
+        const data = await profileApi.getProfile(authState.accessToken);
+        setProfileImageUrl(data.profile_image_url);
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadProfile();
+  }, [authState.accessToken]);
+
+  const handleImageUpdate = (newUrl: string) => {
+    setProfileImageUrl(newUrl);
+  };
 
   return (
     <AuthenticatedLayout>
@@ -29,9 +57,20 @@ const ProfilePage: React.FC = () => {
           </div>
 
           {/* Profile Sections */}
-          <div className="space-y-8">
-            <AboutSection isEditMode={isEditMode} />
-          </div>
+          {loading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="w-8 h-8 border-4 border-accent-col border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <ProfilePictureSection
+                profileImageUrl={profileImageUrl}
+                onImageUpdate={handleImageUpdate}
+                isEditMode={isEditMode}
+              />
+              <AboutSection isEditMode={isEditMode} />
+            </div>
+          )}
         </div>
       </div>
     </AuthenticatedLayout>

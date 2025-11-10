@@ -16,7 +16,6 @@ interface EditableFieldProps {
     birthday: string;
     height: string;
     weight: string;
-    hometown: string;
   };
   label: string;
   placeholder?: string;
@@ -28,7 +27,6 @@ interface EditableFieldProps {
       birthday: string;
       height: string;
       weight: string;
-      hometown: string;
     },
     value: string
   ) => void;
@@ -78,14 +76,12 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
     birthday: string;
     height: string;
     weight: string;
-    hometown: string;
   }>({
     first_name: "",
     last_name: "",
     birthday: "",
     height: "",
     weight: "",
-    hometown: "",
   });
   const [hasChanges, setHasChanges] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -100,12 +96,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
         setProfile(data);
         // Initialize edit values with current profile data
         setEditValues({
-          first_name: data.first_name || "",
-          last_name: data.last_name || "",
+          first_name: data.first_name,
+          last_name: data.last_name,
           birthday: data.birthday || "",
           height: data.height?.toString() || "",
           weight: data.weight?.toString() || "",
-          hometown: data.hometown || "",
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load profile");
@@ -122,12 +117,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
     if (!profile) return;
 
     const hasChanges =
-      editValues.first_name !== (profile.first_name || "") ||
-      editValues.last_name !== (profile.last_name || "") ||
+      editValues.first_name !== profile.first_name ||
+      editValues.last_name !== profile.last_name ||
       editValues.birthday !== (profile.birthday || "") ||
       editValues.height !== (profile.height?.toString() || "") ||
-      editValues.weight !== (profile.weight?.toString() || "") ||
-      editValues.hometown !== (profile.hometown || "");
+      editValues.weight !== (profile.weight?.toString() || "");
 
     setHasChanges(hasChanges);
   }, [editValues, profile]);
@@ -152,14 +146,13 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
         birthday: editValues.birthday || null,
         height: editValues.height ? parseInt(editValues.height) : null,
         weight: editValues.weight ? parseInt(editValues.weight) : null,
-        hometown: editValues.hometown || null,
       };
 
       // Call API to update
-      const updatedProfile = await profileApi.updateProfile(
-        authState.accessToken,
-        updateData
-      );
+      await profileApi.updateProfile(authState.accessToken, updateData);
+
+      // Fetch updated profile after successful update
+      const updatedProfile = await profileApi.getProfile(authState.accessToken);
 
       // Update local state
       setProfile(updatedProfile);
@@ -178,12 +171,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
 
     // Reset to original values
     setEditValues({
-      first_name: profile.first_name || "",
-      last_name: profile.last_name || "",
+      first_name: profile.first_name,
+      last_name: profile.last_name,
       birthday: profile.birthday || "",
       height: profile.height?.toString() || "",
       weight: profile.weight?.toString() || "",
-      hometown: profile.hometown || "",
     });
     setHasChanges(false);
   };
@@ -281,14 +273,6 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
           isEditMode={isEditMode}
           profileValue={profile.weight}
           type="number"
-        />
-        <EditableField
-          field="hometown"
-          label="Hometown"
-          value={editValues.hometown}
-          onChange={handleInputChange}
-          isEditMode={isEditMode}
-          profileValue={profile.hometown}
         />
         <div className="flex items-center space-x-3">
           <div className="flex-1">

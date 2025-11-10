@@ -49,9 +49,9 @@ const uploadRequest = async <T>(
 };
 
 /**
- * Upload types for different video categories
+ * Upload types for different file categories
  */
-export type UploadType = "prompt" | "challenge";
+export type UploadType = "prompt" | "challenge" | "profile_picture";
 
 /**
  * Upload request interface
@@ -80,6 +80,14 @@ export interface UploadResponse {
 }
 
 /**
+ * Profile picture upload response interface
+ */
+export interface ProfilePictureUploadResponse {
+  message: string;
+  profile_image_url: string;
+}
+
+/**
  * Upload API service
  */
 export const uploadApi = {
@@ -105,6 +113,45 @@ export const uploadApi = {
       method: "POST",
       body: formData,
     });
+  },
+
+  /**
+   * Upload profile picture (convenience method)
+   */
+  uploadProfilePicture: async (
+    file: File,
+    accessToken: string
+  ): Promise<ProfilePictureUploadResponse> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return uploadRequest<ProfilePictureUploadResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/profile-picture`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      }
+    );
+  },
+
+  /**
+   * Delete profile picture (convenience method)
+   */
+  deleteProfilePicture: async (
+    accessToken: string
+  ): Promise<{ message: string }> => {
+    return uploadRequest<{ message: string }>(
+      `${config.apiBaseUrl}/api/v1/upload/profile-picture`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
   },
 
   /**
