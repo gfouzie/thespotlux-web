@@ -1,63 +1,59 @@
 import { config } from "@/lib/config";
+import { apiRequest } from "./shared";
 
+/**
+ * User profile interface
+ * Uses camelCase (automatically converted from snake_case by API middleware)
+ */
 export interface UserProfile {
   id: number;
-  account_id: number;
+  accountId: number;
   username: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   birthday: string | null;
   height: number | null;
   weight: number | null;
-  profile_image_url: string;
-  tier_id: number | null;
+  profileImageUrl: string;
+  tierId: number | null;
 }
 
+/**
+ * Profile update request interface
+ * Uses camelCase (automatically converted to snake_case by API middleware)
+ */
 export interface ProfileUpdateRequest {
-  first_name?: string | null;
-  last_name?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   birthday?: string | null;
   height?: number | null;
   weight?: number | null;
-  profile_image_url?: string | null;
+  profileImageUrl?: string | null;
 }
 
 export const profileApi = {
   async getProfile(accessToken: string): Promise<UserProfile> {
-    const response = await fetch(`${config.apiBaseUrl}/api/v1/user/me/`, {
+    return apiRequest<UserProfile>(`${config.apiBaseUrl}/api/v1/user/me/`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
       },
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const data: UserProfile = await response.json();
-    return data;
   },
 
   async updateProfile(
     accessToken: string,
     updateData: ProfileUpdateRequest
   ): Promise<{ message: string }> {
-    const response = await fetch(`${config.apiBaseUrl}/api/v1/user/me`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updateData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-
-    const data: { message: string } = await response.json();
-    return data;
+    return apiRequest<{ message: string }>(
+      `${config.apiBaseUrl}/api/v1/user/me`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(updateData),
+      }
+    );
   },
 };

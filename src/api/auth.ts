@@ -13,8 +13,8 @@ export interface LoginCredentials {
  * Login response interface
  */
 export interface LoginResponse {
-  access_token: string;
-  token_type: string;
+  accessToken: string;
+  tokenType: string;
 }
 
 /**

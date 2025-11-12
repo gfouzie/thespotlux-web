@@ -11,8 +11,8 @@ interface AboutSectionProps {
 
 interface EditableFieldProps {
   field: keyof {
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     birthday: string;
     height: string;
     weight: string;
@@ -22,8 +22,8 @@ interface EditableFieldProps {
   value: string;
   onChange: (
     field: keyof {
-      first_name: string;
-      last_name: string;
+      firstName: string;
+      lastName: string;
       birthday: string;
       height: string;
       weight: string;
@@ -71,14 +71,14 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editValues, setEditValues] = useState<{
-    first_name: string;
-    last_name: string;
+    firstName: string;
+    lastName: string;
     birthday: string;
     height: string;
     weight: string;
   }>({
-    first_name: "",
-    last_name: "",
+    firstName: "",
+    lastName: "",
     birthday: "",
     height: "",
     weight: "",
@@ -96,8 +96,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
         setProfile(data);
         // Initialize edit values with current profile data
         setEditValues({
-          first_name: data.first_name,
-          last_name: data.last_name,
+          firstName: data.firstName,
+          lastName: data.lastName,
           birthday: data.birthday || "",
           height: data.height?.toString() || "",
           weight: data.weight?.toString() || "",
@@ -117,8 +117,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
     if (!profile) return;
 
     const hasChanges =
-      editValues.first_name !== profile.first_name ||
-      editValues.last_name !== profile.last_name ||
+      editValues.firstName !== profile.firstName ||
+      editValues.lastName !== profile.lastName ||
       editValues.birthday !== (profile.birthday || "") ||
       editValues.height !== (profile.height?.toString() || "") ||
       editValues.weight !== (profile.weight?.toString() || "");
@@ -141,8 +141,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
 
       // Prepare update data
       const updateData: ProfileUpdateRequest = {
-        first_name: editValues.first_name || null,
-        last_name: editValues.last_name || null,
+        firstName: editValues.firstName || null,
+        lastName: editValues.lastName || null,
         birthday: editValues.birthday || null,
         height: editValues.height ? parseInt(editValues.height) : null,
         weight: editValues.weight ? parseInt(editValues.weight) : null,
@@ -171,8 +171,8 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
 
     // Reset to original values
     setEditValues({
-      first_name: profile.first_name,
-      last_name: profile.last_name,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
       birthday: profile.birthday || "",
       height: profile.height?.toString() || "",
       weight: profile.weight?.toString() || "",
@@ -232,20 +232,20 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
       </div>
       <div className="space-y-4">
         <EditableField
-          field="first_name"
+          field="firstName"
           label="First Name"
-          value={editValues.first_name}
+          value={editValues.firstName}
           onChange={handleInputChange}
           isEditMode={isEditMode}
-          profileValue={profile.first_name}
+          profileValue={profile.firstName}
         />
         <EditableField
-          field="last_name"
+          field="lastName"
           label="Last Name"
-          value={editValues.last_name}
+          value={editValues.lastName}
           onChange={handleInputChange}
           isEditMode={isEditMode}
-          profileValue={profile.last_name}
+          profileValue={profile.lastName}
         />
         <EditableField
           field="birthday"

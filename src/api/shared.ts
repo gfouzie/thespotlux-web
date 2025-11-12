@@ -1,10 +1,15 @@
 import { config } from "@/lib/config";
+import { keysToCamel, keysToSnake } from "@/lib/caseConversion";
 
 /**
  * API Error class for handling backend errors
  */
 export class ApiError extends Error {
-  constructor(message: string, public status: number, public data?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    public status: number,
+    public data?: Record<string, unknown>
+  ) {
     super(message);
     this.name = "ApiError";
   }
@@ -12,6 +17,8 @@ export class ApiError extends Error {
 
 /**
  * Generic API request handler with error handling and timeout
+ * Automatically converts request bodies from camelCase to snake_case
+ * and response data from snake_case to camelCase
  */
 export const apiRequest = async <T>(
   url: string,
@@ -20,9 +27,22 @@ export const apiRequest = async <T>(
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), config.apiTimeout);
 
+  // Convert request body from camelCase to snake_case if present
+  const processedOptions: RequestInit = { ...options };
+  if (options.body && typeof options.body === "string") {
+    try {
+      const bodyObj = JSON.parse(options.body);
+      const snakeCaseBody = keysToSnake(bodyObj);
+      processedOptions.body = JSON.stringify(snakeCaseBody);
+    } catch {
+      // If body is not JSON, leave it as is
+      processedOptions.body = options.body;
+    }
+  }
+
   try {
     const response = await fetch(url, {
-      ...options,
+      ...processedOptions,
       signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
@@ -41,7 +61,9 @@ export const apiRequest = async <T>(
       );
     }
 
-    return await response.json();
+    // Convert response from snake_case to camelCase
+    const responseData = await response.json();
+    return keysToCamel(responseData) as T;
   } catch (error) {
     clearTimeout(timeoutId);
 

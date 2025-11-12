@@ -51,7 +51,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
         authState.accessToken
       );
 
-      onImageUpdate(response.profile_image_url);
+      onImageUpdate(response.profileImageUrl);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to upload profile picture"

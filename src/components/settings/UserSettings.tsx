@@ -10,8 +10,8 @@ interface UserSettingsProps {
     uuid: string;
     username: string;
     email: string;
-    first_name?: string | null;
-    last_name?: string | null;
+    firstName?: string | null;
+    lastName?: string | null;
   };
 }
 
@@ -62,8 +62,8 @@ const UserSettings = ({ user }: UserSettingsProps) => {
           <div className="flex justify-between items-center py-2">
             <span className="text-sm font-medium text-text-col">Name</span>
             <span className="text-sm text-text-col/70">
-              {user?.first_name && user?.last_name
-                ? `${user.first_name} ${user.last_name}`
+              {user?.firstName && user?.lastName
+                ? `${user.firstName} ${user.lastName}`
                 : "Not provided"}
             </span>
           </div>

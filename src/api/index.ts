@@ -2,4 +2,5 @@
 export * from "./shared";
 export * from "./auth";
 export * from "./user";
+export * from "./userTeams";
 export * from "./sports";

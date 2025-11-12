@@ -20,7 +20,7 @@ const ProfilePage: React.FC = () => {
       try {
         setLoading(true);
         const data = await profileApi.getProfile(authState.accessToken);
-        setProfileImageUrl(data.profile_image_url);
+        setProfileImageUrl(data.profileImageUrl);
       } catch (err) {
         console.error("Failed to load profile:", err);
       } finally {

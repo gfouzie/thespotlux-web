@@ -4,10 +4,11 @@ import { authApi, type LoginResponse } from "./auth";
 
 /**
  * User registration data interface
+ * Uses camelCase (automatically converted to snake_case by API middleware)
  */
 export interface RegisterUserData {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   username: string;
   email: string;
   password: string;
@@ -15,15 +16,16 @@ export interface RegisterUserData {
 
 /**
  * User response interface
+ * Uses camelCase (automatically converted from snake_case by API middleware)
  */
 export interface User {
   id: number;
-  first_name: string | null;
-  last_name: string | null;
+  firstName: string | null;
+  lastName: string | null;
   username: string;
   email: string;
-  profile_image_url: string;
-  role_id: number | null;
+  profileImageUrl: string;
+  roleId: number | null;
 }
 
 /**
@@ -61,7 +63,7 @@ export const userApi = {
    */
   getRoles: async (): Promise<{
     roles: Record<number, string>;
-    default_role: number;
+    defaultRole: number;
   }> => {
     return apiRequest(`${config.apiBaseUrl}/api/v1/roles`);
   },

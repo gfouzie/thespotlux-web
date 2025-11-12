@@ -1,8 +1,10 @@
 import { config } from "@/lib/config";
 import { ApiError } from "./shared";
+import { keysToCamel } from "@/lib/caseConversion";
 
 /**
  * Upload-specific request handler that doesn't set Content-Type for FormData
+ * Automatically converts response data from snake_case to camelCase
  */
 const uploadRequest = async <T>(
   url: string,
@@ -29,7 +31,9 @@ const uploadRequest = async <T>(
       );
     }
 
-    return await response.json();
+    // Convert response from snake_case to camelCase
+    const responseData = await response.json();
+    return keysToCamel(responseData) as T;
   } catch (error) {
     clearTimeout(timeoutId);
 
@@ -68,23 +72,25 @@ export interface UploadRequest {
 
 /**
  * Upload response interface
+ * Uses camelCase (automatically converted from snake_case by upload middleware)
  */
 export interface UploadResponse {
   message: string;
   filename: string;
-  s3_key: string;
-  file_url: string;
-  file_size: number;
-  upload_type: UploadType;
-  bucket_name: string;
+  s3Key: string;
+  fileUrl: string;
+  fileSize: number;
+  uploadType: UploadType;
+  bucketName: string;
 }
 
 /**
  * Profile picture upload response interface
+ * Uses camelCase (automatically converted from snake_case by upload middleware)
  */
 export interface ProfilePictureUploadResponse {
   message: string;
-  profile_image_url: string;
+  profileImageUrl: string;
 }
 
 /**

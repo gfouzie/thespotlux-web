@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       dispatch({ type: "SET_ERROR", error: null });
 
       const response = await authApi.login(credentials);
-      dispatch({ type: "LOGIN_SUCCESS", token: response.access_token });
+      dispatch({ type: "LOGIN_SUCCESS", token: response.accessToken });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
@@ -126,7 +126,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       try {
         // Try to refresh token using the HTTP-only cookie
         const response = await authApi.refresh();
-        dispatch({ type: "TOKEN_REFRESH", token: response.access_token });
+        dispatch({ type: "TOKEN_REFRESH", token: response.accessToken });
       } catch (error) {
         // No valid refresh token, user is not authenticated
         dispatch({ type: "LOGOUT" });
@@ -143,7 +143,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const refreshInterval = setInterval(async () => {
       try {
         const response = await authApi.refresh();
-        dispatch({ type: "TOKEN_REFRESH", token: response.access_token });
+        dispatch({ type: "TOKEN_REFRESH", token: response.accessToken });
       } catch (error) {
         console.error("Token refresh failed:", error);
         dispatch({ type: "LOGOUT" });
