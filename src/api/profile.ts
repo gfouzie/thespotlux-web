@@ -17,6 +17,7 @@ export interface UserProfile {
   weight: number | null;
   profileImageUrl: string;
   tierId: number | null;
+  isSuperuser: boolean;
 }
 
 /**

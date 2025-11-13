@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/contexts/UserContext";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -9,6 +10,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Settings, LogOut, ArrowLeft, ArrowRight } from "iconoir-react";
 import Icon from "@/components/common/Icon";
 import { navigationItems } from "@/constants/navigation";
+import { superuserNavigationItems } from "@/constants/superuserNavigation";
 
 interface SidebarProps {
   className?: string;
@@ -16,6 +18,7 @@ interface SidebarProps {
 
 const Sidebar = ({ className = "" }: SidebarProps) => {
   const { authState, logout } = useAuth();
+  const { isSuperuser } = useUser();
   const router = useRouter();
   const pathname = usePathname();
   const { theme } = useTheme();
@@ -127,6 +130,11 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
         {navigationItems.map((item) => (
           <NavItem key={item.name} item={item} />
         ))}
+
+        {isSuperuser &&
+          superuserNavigationItems.map((item) => (
+            <NavItem key={item.name} item={item} />
+          ))}
       </nav>
 
       {/* Bottom Section */}
