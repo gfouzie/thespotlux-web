@@ -4,11 +4,14 @@ import React, { useState, useEffect } from "react";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import AboutSection from "@/components/profile/AboutSection";
 import ProfilePictureSection from "@/components/profile/ProfilePictureSection";
+import FriendsPreview from "@/components/friends/FriendsPreview";
 import { profileApi } from "@/api/profile";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUser } from "@/contexts/UserContext";
 
 const ProfilePage: React.FC = () => {
   const { authState } = useAuth();
+  const { user } = useUser();
   const [isEditMode, setIsEditMode] = useState(true);
   const [profileImageUrl, setProfileImageUrl] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -69,6 +72,9 @@ const ProfilePage: React.FC = () => {
                 isEditMode={isEditMode}
               />
               <AboutSection isEditMode={isEditMode} />
+              {user && (
+                <FriendsPreview userId={user.id} isOwnProfile={true} />
+              )}
             </div>
           )}
         </div>
