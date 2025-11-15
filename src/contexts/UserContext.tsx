@@ -46,11 +46,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (authState.isAuthenticated && authState.accessToken) {
       fetchUserData(authState.accessToken);
-    } else {
+    } else if (!authState.isLoading) {
       setUser(null);
       setIsLoading(false);
     }
-  }, [authState.isAuthenticated, authState.accessToken, fetchUserData]);
+  }, [
+    authState.isAuthenticated,
+    authState.accessToken,
+    authState.isLoading,
+    fetchUserData,
+  ]);
 
   const value: UserContextType = {
     user,
