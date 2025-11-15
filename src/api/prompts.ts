@@ -32,7 +32,7 @@ export interface PaginatedPromptsResponse {
 
 export const promptsApi = {
   async getPrompts(
-    token: string,
+    accessToken: string,
     page: number = 1,
     itemsPerPage: number = 50,
     sport?: string
@@ -49,44 +49,45 @@ export const promptsApi = {
     return apiRequest<PaginatedPromptsResponse>(
       `${config.apiBaseUrl}/api/v1/prompts?${params}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 
-  async createPrompt(token: string, prompt: PromptCreate): Promise<Prompt> {
-    return apiRequest<Prompt>(`${config.apiBaseUrl}/api/v1/prompts`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
+  async createPrompt(accessToken: string, prompt: PromptCreate): Promise<Prompt> {
+    return apiRequest<Prompt>(
+      `${config.apiBaseUrl}/api/v1/prompts`,
+      {
+        method: "POST",
+        body: JSON.stringify(prompt),
       },
-      body: JSON.stringify(prompt),
-    });
+      accessToken
+    );
   },
 
   async updatePrompt(
-    token: string,
+    accessToken: string,
     id: number,
     prompt: PromptUpdate
   ): Promise<Prompt> {
-    return apiRequest<Prompt>(`${config.apiBaseUrl}/api/v1/prompts/${id}`, {
-      method: "PATCH",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    return apiRequest<Prompt>(
+      `${config.apiBaseUrl}/api/v1/prompts/${id}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(prompt),
       },
-      body: JSON.stringify(prompt),
-    });
+      accessToken
+    );
   },
 
-  async deletePrompt(token: string, id: number): Promise<void> {
-    await apiRequest<void>(`${config.apiBaseUrl}/api/v1/prompts/${id}`, {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${token}`,
+  async deletePrompt(accessToken: string, id: number): Promise<void> {
+    await apiRequest<void>(
+      `${config.apiBaseUrl}/api/v1/prompts/${id}`,
+      {
+        method: "DELETE",
       },
-    });
+      accessToken
+    );
   },
 };

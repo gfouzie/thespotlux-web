@@ -5,18 +5,32 @@ import { keysToCamel } from "@/lib/caseConversion";
 /**
  * Upload-specific request handler that doesn't set Content-Type for FormData
  * Automatically converts response data from snake_case to camelCase
+ * @param url - The URL to fetch
+ * @param options - Fetch options (method, body, headers, etc.)
+ * @param accessToken - Optional JWT access token (will be added as Bearer token)
  */
 const uploadRequest = async <T>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  accessToken?: string
 ): Promise<T> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds
+
+  // Build headers with automatic Authorization if accessToken provided
+  const headers: Record<string, string> = {
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
 
   try {
     const response = await fetch(url, {
       ...options,
       signal: controller.signal,
+      headers,
       // Don't set Content-Type - let browser set it for FormData
     });
 
@@ -31,8 +45,21 @@ const uploadRequest = async <T>(
       );
     }
 
+    // Handle empty responses (e.g., 204 No Content, DELETE requests)
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      // If no JSON content, return empty object or handle as void
+      return undefined as T;
+    }
+
+    // Check if response has content
+    const text = await response.text();
+    if (!text) {
+      return undefined as T;
+    }
+
     // Convert response from snake_case to camelCase
-    const responseData = await response.json();
+    const responseData = JSON.parse(text);
     return keysToCamel(responseData) as T;
   } catch (error) {
     clearTimeout(timeoutId);
@@ -135,11 +162,9 @@ export const uploadApi = {
       `${config.apiBaseUrl}/api/v1/upload/profile-picture`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         body: formData,
-      }
+      },
+      accessToken
     );
   },
 
@@ -153,10 +178,8 @@ export const uploadApi = {
       `${config.apiBaseUrl}/api/v1/upload/profile-picture`,
       {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      }
+      },
+      accessToken
     );
   },
 

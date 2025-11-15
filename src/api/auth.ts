@@ -43,11 +43,9 @@ export const authApi = {
       `${config.apiBaseUrl}/api/v1/logout`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         credentials: "include", // Include cookies for refresh token
-      }
+      },
+      accessToken
     );
   },
 

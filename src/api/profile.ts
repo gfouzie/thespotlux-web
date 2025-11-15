@@ -35,11 +35,11 @@ export interface ProfileUpdateRequest {
 
 export const profileApi = {
   async getProfile(accessToken: string): Promise<UserProfile> {
-    return apiRequest<UserProfile>(`${config.apiBaseUrl}/api/v1/user/me/`, {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+    return apiRequest<UserProfile>(
+      `${config.apiBaseUrl}/api/v1/user/me/`,
+      {},
+      accessToken
+    );
   },
 
   async updateProfile(
@@ -50,11 +50,9 @@ export const profileApi = {
       `${config.apiBaseUrl}/api/v1/user/me`,
       {
         method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
         body: JSON.stringify(updateData),
-      }
+      },
+      accessToken
     );
   },
 };

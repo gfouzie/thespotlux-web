@@ -19,10 +19,14 @@ export class ApiError extends Error {
  * Generic API request handler with error handling and timeout
  * Automatically converts request bodies from camelCase to snake_case
  * and response data from snake_case to camelCase
+ * @param url - The URL to fetch
+ * @param options - Fetch options (method, body, headers, etc.)
+ * @param accessToken - Optional JWT access token (will be added as Bearer token)
  */
 export const apiRequest = async <T>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  accessToken?: string
 ): Promise<T> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), config.apiTimeout);
@@ -40,14 +44,21 @@ export const apiRequest = async <T>(
     }
   }
 
+  // Build headers with automatic Authorization if accessToken provided
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (accessToken) {
+    headers.Authorization = `Bearer ${accessToken}`;
+  }
+
   try {
     const response = await fetch(url, {
       ...processedOptions,
       signal: controller.signal,
-      headers: {
-        "Content-Type": "application/json",
-        ...options.headers,
-      },
+      headers,
     });
 
     clearTimeout(timeoutId);
@@ -61,8 +72,21 @@ export const apiRequest = async <T>(
       );
     }
 
+    // Handle empty responses (e.g., 204 No Content, DELETE requests)
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      // If no JSON content, return empty object or handle as void
+      return undefined as T;
+    }
+
+    // Check if response has content
+    const text = await response.text();
+    if (!text) {
+      return undefined as T;
+    }
+
     // Convert response from snake_case to camelCase
-    const responseData = await response.json();
+    const responseData = JSON.parse(text);
     return keysToCamel(responseData) as T;
   } catch (error) {
     clearTimeout(timeoutId);

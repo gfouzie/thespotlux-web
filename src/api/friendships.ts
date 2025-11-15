@@ -46,24 +46,22 @@ export interface PaginatedUsersResponse {
 export const friendshipsApi = {
   // Send friend request
   async sendFriendRequest(
-    token: string,
+    accessToken: string,
     request: FriendshipSendRequest
   ): Promise<FriendshipSendResponse> {
     return apiRequest<FriendshipSendResponse>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests`,
       {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify(request),
-      }
+      },
+      accessToken
     );
   },
 
   // Get received friend requests
   async getReceivedRequests(
-    token: string,
+    accessToken: string,
     page: number = 1,
     itemsPerPage: number = 20
   ): Promise<PaginatedFriendshipsResponse> {
@@ -75,17 +73,15 @@ export const friendshipsApi = {
     return apiRequest<PaginatedFriendshipsResponse>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests/received?${params}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 
   // Get sent friend requests
   async getSentRequests(
-    token: string,
+    accessToken: string,
     page: number = 1,
     itemsPerPage: number = 20
   ): Promise<PaginatedFriendshipsResponse> {
@@ -97,43 +93,37 @@ export const friendshipsApi = {
     return apiRequest<PaginatedFriendshipsResponse>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests/sent?${params}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 
   // Accept friend request
-  async acceptFriendRequest(token: string, friendshipId: number): Promise<Friendship> {
+  async acceptFriendRequest(accessToken: string, friendshipId: number): Promise<Friendship> {
     return apiRequest<Friendship>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests/${friendshipId}/accept`,
       {
         method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      },
+      accessToken
     );
   },
 
   // Reject friend request
-  async rejectFriendRequest(token: string, friendshipId: number): Promise<Friendship> {
+  async rejectFriendRequest(accessToken: string, friendshipId: number): Promise<Friendship> {
     return apiRequest<Friendship>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests/${friendshipId}/reject`,
       {
         method: "PATCH",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      },
+      accessToken
     );
   },
 
   // Get my friends list
   async getMyFriends(
-    token: string,
+    accessToken: string,
     page: number = 1,
     itemsPerPage: number = 20
   ): Promise<PaginatedUsersResponse> {
@@ -145,30 +135,26 @@ export const friendshipsApi = {
     return apiRequest<PaginatedUsersResponse>(
       `${config.apiBaseUrl}/api/v1/user/friends?${params}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 
   // Unfriend a user
-  async unfriend(token: string, userId: number): Promise<void> {
+  async unfriend(accessToken: string, userId: number): Promise<void> {
     await apiRequest<void>(
       `${config.apiBaseUrl}/api/v1/user/friends/${userId}`,
       {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
+      },
+      accessToken
     );
   },
 
   // Get another user's friends list
   async getUserFriends(
-    token: string,
+    accessToken: string,
     userId: number,
     page: number = 1,
     itemsPerPage: number = 20
@@ -181,33 +167,29 @@ export const friendshipsApi = {
     return apiRequest<PaginatedUsersResponse>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/friends?${params}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 
   // Check friendship status with a user
   async getFriendshipStatus(
-    token: string,
+    accessToken: string,
     userId: number
   ): Promise<FriendshipStatusResponse> {
     return apiRequest<FriendshipStatusResponse>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/friendship-status`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 
   // Get mutual friends with a user
   async getMutualFriends(
-    token: string,
+    accessToken: string,
     userId: number,
     page: number = 1,
     itemsPerPage: number = 20
@@ -220,11 +202,9 @@ export const friendshipsApi = {
     return apiRequest<PaginatedUsersResponse>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/mutual-friends?${params}`,
       {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         cache: "no-store",
-      }
+      },
+      accessToken
     );
   },
 };
