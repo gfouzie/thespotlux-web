@@ -20,12 +20,28 @@ export interface RegisterUserData {
  */
 export interface User {
   id: number;
+  accountId: number;
   firstName: string | null;
   lastName: string | null;
   username: string;
   email: string;
   profileImageUrl: string;
-  roleId: number | null;
+  birthday: string | null;
+  height: number | null;
+  weight: number | null;
+  tierId: number | null;
+  isSuperuser: boolean;
+}
+
+/**
+ * Paginated users response interface
+ */
+export interface PaginatedUsersResponse {
+  data: User[];
+  totalCount: number;
+  page: number;
+  itemsPerPage: number;
+  hasMore: boolean;
 }
 
 /**
@@ -74,6 +90,33 @@ export const userApi = {
   getUserByUsername: async (username: string): Promise<User> => {
     return apiRequest<User>(
       `${config.apiBaseUrl}/api/v1/user/by-username/${username}`
+    );
+  },
+
+  /**
+   * Get paginated list of users with optional search
+   */
+  getUsers: async (
+    accessToken: string,
+    page: number = 1,
+    itemsPerPage: number = 20,
+    search?: string
+  ): Promise<PaginatedUsersResponse> => {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      items_per_page: itemsPerPage.toString(),
+    });
+
+    if (search) {
+      params.append("search", search);
+    }
+
+    return apiRequest<PaginatedUsersResponse>(
+      `${config.apiBaseUrl}/api/v1/users?${params}`,
+      {
+        cache: "no-store",
+      },
+      accessToken
     );
   },
 };
