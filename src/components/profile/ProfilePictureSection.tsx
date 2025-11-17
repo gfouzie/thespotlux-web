@@ -16,7 +16,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   onImageUpdate,
   isEditMode,
 }) => {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -26,7 +26,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
-    if (!file || !authState.accessToken) return;
+    if (!file || !isAuthenticated) return;
 
     // Validate file type
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
@@ -47,8 +47,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
       setError(null);
 
       const response = await uploadApi.uploadProfilePicture(
-        file,
-        authState.accessToken
+        file
       );
 
       onImageUpdate(response.profileImageUrl);
@@ -66,13 +65,13 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   };
 
   const handleDelete = async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setUploading(true);
       setError(null);
 
-      await uploadApi.deleteProfilePicture(authState.accessToken);
+      await uploadApi.deleteProfilePicture();
 
       onImageUpdate("https://profileimageurl.com");
       setShowDeleteConfirm(false);

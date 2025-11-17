@@ -7,23 +7,22 @@ import Button from "@/components/common/Button";
 import Alert from "@/components/common/Alert";
 
 export default function RequestsCard() {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [requests, setRequests] = useState<Friendship[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadRequests();
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   const loadRequests = async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
       const response = await friendshipsApi.getReceivedRequests(
-        authState.accessToken,
         1,
         100
       );
@@ -36,11 +35,10 @@ export default function RequestsCard() {
   };
 
   const handleAccept = async (friendshipId: number) => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       await friendshipsApi.acceptFriendRequest(
-        authState.accessToken,
         friendshipId
       );
       await loadRequests();
@@ -50,11 +48,10 @@ export default function RequestsCard() {
   };
 
   const handleReject = async (friendshipId: number) => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       await friendshipsApi.rejectFriendRequest(
-        authState.accessToken,
         friendshipId
       );
       await loadRequests();

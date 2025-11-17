@@ -12,7 +12,7 @@ interface FriendButtonProps {
 }
 
 export default function FriendButton({ userId, onStatusChange }: FriendButtonProps) {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [status, setStatus] = useState<FriendshipStatusResponse | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isActionLoading, setIsActionLoading] = useState(false);
@@ -20,19 +20,18 @@ export default function FriendButton({ userId, onStatusChange }: FriendButtonPro
   const [showAutoAcceptMessage, setShowAutoAcceptMessage] = useState(false);
 
   useEffect(() => {
-    if (authState.accessToken) {
+    if (isAuthenticated) {
       loadFriendshipStatus();
     }
-  }, [authState.accessToken, userId]);
+  }, [isAuthenticated, userId]);
 
   const loadFriendshipStatus = async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
       const statusData = await friendshipsApi.getFriendshipStatus(
-        authState.accessToken,
         userId
       );
       setStatus(statusData);
@@ -44,12 +43,12 @@ export default function FriendButton({ userId, onStatusChange }: FriendButtonPro
   };
 
   const handleSendRequest = async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsActionLoading(true);
       setError(null);
-      const response = await friendshipsApi.sendFriendRequest(authState.accessToken, {
+      const response = await friendshipsApi.sendFriendRequest({
         addresseeId: userId,
       });
 
@@ -68,12 +67,12 @@ export default function FriendButton({ userId, onStatusChange }: FriendButtonPro
   };
 
   const handleAcceptRequest = async () => {
-    if (!authState.accessToken || !status?.friendshipId) return;
+    if (!isAuthenticated || !status?.friendshipId) return;
 
     try {
       setIsActionLoading(true);
       setError(null);
-      await friendshipsApi.acceptFriendRequest(authState.accessToken, status.friendshipId);
+      await friendshipsApi.acceptFriendRequest(status.friendshipId);
       await loadFriendshipStatus();
       onStatusChange?.();
     } catch (err) {
@@ -84,12 +83,12 @@ export default function FriendButton({ userId, onStatusChange }: FriendButtonPro
   };
 
   const handleRejectRequest = async () => {
-    if (!authState.accessToken || !status?.friendshipId) return;
+    if (!isAuthenticated || !status?.friendshipId) return;
 
     try {
       setIsActionLoading(true);
       setError(null);
-      await friendshipsApi.rejectFriendRequest(authState.accessToken, status.friendshipId);
+      await friendshipsApi.rejectFriendRequest(status.friendshipId);
       await loadFriendshipStatus();
       onStatusChange?.();
     } catch (err) {
@@ -100,13 +99,13 @@ export default function FriendButton({ userId, onStatusChange }: FriendButtonPro
   };
 
   const handleUnfriend = async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
     if (!confirm("Are you sure you want to unfriend this user?")) return;
 
     try {
       setIsActionLoading(true);
       setError(null);
-      await friendshipsApi.unfriend(authState.accessToken, userId);
+      await friendshipsApi.unfriend(userId);
       await loadFriendshipStatus();
       onStatusChange?.();
     } catch (err) {

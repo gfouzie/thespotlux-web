@@ -14,20 +14,20 @@ export const ProtectedRoute = ({
   children,
   redirectTo = "/login",
 }: ProtectedRouteProps) => {
-  const { authState } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!authState.isLoading && !authState.isAuthenticated) {
+    if (!isLoading && !isAuthenticated) {
       router.push(redirectTo);
     }
-  }, [authState.isLoading, authState.isAuthenticated, router, redirectTo]);
+  }, [isLoading, isAuthenticated, router, redirectTo]);
 
-  if (authState.isLoading) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
-  if (!authState.isAuthenticated) {
+  if (!isAuthenticated) {
     return null;
   }
 
@@ -43,20 +43,20 @@ export const PublicRoute = ({
   children,
   redirectTo = "/",
 }: PublicRouteProps) => {
-  const { authState } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!authState.isLoading && authState.isAuthenticated) {
+    if (!isLoading && isAuthenticated) {
       router.push(redirectTo);
     }
-  }, [authState.isLoading, authState.isAuthenticated, router, redirectTo]);
+  }, [isLoading, isAuthenticated, router, redirectTo]);
 
-  if (authState.isLoading) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
-  if (authState.isAuthenticated) {
+  if (isAuthenticated) {
     return null;
   }
 

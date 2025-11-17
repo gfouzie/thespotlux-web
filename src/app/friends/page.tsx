@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { friendshipsApi, type Friendship, type PaginatedUsersResponse } from "@/api/friendships";
+import { friendshipsApi, type Friendship } from "@/api/friendships";
 import { UserProfile } from "@/api/profile";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import Button from "@/components/common/Button";
@@ -13,7 +13,7 @@ import Link from "next/link";
 type TabType = "friends" | "received" | "sent";
 
 export default function FriendsPage() {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<TabType>("friends");
   const [friends, setFriends] = useState<UserProfile[]>([]);
   const [receivedRequests, setReceivedRequests] = useState<Friendship[]>([]);
@@ -21,58 +21,56 @@ export default function FriendsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [totalCount, setTotalCount] = useState(0);
 
   const loadFriends = useCallback(async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getMyFriends(authState.accessToken, 1, 100);
+      const response = await friendshipsApi.getMyFriends(1, 100);
       setFriends(response.data);
-      setTotalCount(response.totalCount);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load friends");
     } finally {
       setIsLoading(false);
     }
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   const loadReceivedRequests = useCallback(async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getReceivedRequests(authState.accessToken, 1, 100);
+      const response = await friendshipsApi.getReceivedRequests(1, 100);
       setReceivedRequests(response.data);
-      setTotalCount(response.totalCount);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load requests");
     } finally {
       setIsLoading(false);
     }
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   const loadSentRequests = useCallback(async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getSentRequests(authState.accessToken, 1, 100);
+      const response = await friendshipsApi.getSentRequests(1, 100);
       setSentRequests(response.data);
-      setTotalCount(response.totalCount);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load sent requests");
+      setError(
+        err instanceof Error ? err.message : "Failed to load sent requests"
+      );
     } finally {
       setIsLoading(false);
     }
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
-    if (authState.accessToken) {
+    if (isAuthenticated) {
       switch (activeTab) {
         case "friends":
           loadFriends();
@@ -85,13 +83,19 @@ export default function FriendsPage() {
           break;
       }
     }
-  }, [activeTab, authState.accessToken, loadFriends, loadReceivedRequests, loadSentRequests]);
+  }, [
+    activeTab,
+    isAuthenticated,
+    loadFriends,
+    loadReceivedRequests,
+    loadSentRequests,
+  ]);
 
   const handleAcceptRequest = async (friendshipId: number) => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
-      await friendshipsApi.acceptFriendRequest(authState.accessToken, friendshipId);
+      await friendshipsApi.acceptFriendRequest(friendshipId);
       await loadReceivedRequests();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to accept request");
@@ -99,10 +103,10 @@ export default function FriendsPage() {
   };
 
   const handleRejectRequest = async (friendshipId: number) => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
-      await friendshipsApi.rejectFriendRequest(authState.accessToken, friendshipId);
+      await friendshipsApi.rejectFriendRequest(friendshipId);
       await loadReceivedRequests();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to reject request");
@@ -110,11 +114,11 @@ export default function FriendsPage() {
   };
 
   const handleUnfriend = async (userId: number) => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
     if (!confirm("Are you sure you want to unfriend this user?")) return;
 
     try {
-      await friendshipsApi.unfriend(authState.accessToken, userId);
+      await friendshipsApi.unfriend(userId);
       await loadFriends();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to unfriend user");
@@ -183,10 +187,14 @@ export default function FriendsPage() {
             />
 
             {isLoading ? (
-              <div className="text-center text-text-col">Loading friends...</div>
+              <div className="text-center text-text-col">
+                Loading friends...
+              </div>
             ) : filteredFriends.length === 0 ? (
               <div className="text-center text-text-col/50">
-                {searchQuery ? "No friends found matching your search" : "You have no friends yet"}
+                {searchQuery
+                  ? "No friends found matching your search"
+                  : "You have no friends yet"}
               </div>
             ) : (
               <div className="space-y-2">
@@ -212,7 +220,9 @@ export default function FriendsPage() {
                         <div className="font-medium text-text-col">
                           {friend.firstName} {friend.lastName}
                         </div>
-                        <div className="text-sm text-text-col/60">@{friend.username}</div>
+                        <div className="text-sm text-text-col/60">
+                          @{friend.username}
+                        </div>
                       </div>
                     </Link>
                     <Button
@@ -233,9 +243,13 @@ export default function FriendsPage() {
         {activeTab === "received" && (
           <div>
             {isLoading ? (
-              <div className="text-center text-text-col">Loading requests...</div>
+              <div className="text-center text-text-col">
+                Loading requests...
+              </div>
             ) : receivedRequests.length === 0 ? (
-              <div className="text-center text-text-col/50">No pending friend requests</div>
+              <div className="text-center text-text-col/50">
+                No pending friend requests
+              </div>
             ) : (
               <div className="space-y-2">
                 {receivedRequests.map((request) => (
@@ -244,13 +258,18 @@ export default function FriendsPage() {
                     className="p-4 bg-bg-col/30 rounded border border-bg-col flex justify-between items-center"
                   >
                     <div>
-                      <div className="font-medium text-text-col">User ID: {request.requesterId}</div>
+                      <div className="font-medium text-text-col">
+                        User ID: {request.requesterId}
+                      </div>
                       <div className="text-sm text-text-col/60">
                         Sent {new Date(request.createdAt).toLocaleDateString()}
                       </div>
                     </div>
                     <div className="flex gap-2">
-                      <Button size="sm" onClick={() => handleAcceptRequest(request.id)}>
+                      <Button
+                        size="sm"
+                        onClick={() => handleAcceptRequest(request.id)}
+                      >
                         Accept
                       </Button>
                       <Button
@@ -272,9 +291,13 @@ export default function FriendsPage() {
         {activeTab === "sent" && (
           <div>
             {isLoading ? (
-              <div className="text-center text-text-col">Loading sent requests...</div>
+              <div className="text-center text-text-col">
+                Loading sent requests...
+              </div>
             ) : sentRequests.length === 0 ? (
-              <div className="text-center text-text-col/50">No pending sent requests</div>
+              <div className="text-center text-text-col/50">
+                No pending sent requests
+              </div>
             ) : (
               <div className="space-y-2">
                 {sentRequests.map((request) => (
@@ -283,7 +306,9 @@ export default function FriendsPage() {
                     className="p-4 bg-bg-col/30 rounded border border-bg-col flex justify-between items-center"
                   >
                     <div>
-                      <div className="font-medium text-text-col">User ID: {request.addresseeId}</div>
+                      <div className="font-medium text-text-col">
+                        User ID: {request.addresseeId}
+                      </div>
                       <div className="text-sm text-text-col/60">
                         Sent {new Date(request.createdAt).toLocaleDateString()}
                       </div>

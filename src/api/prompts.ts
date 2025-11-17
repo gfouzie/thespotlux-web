@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { apiRequest } from "./shared";
+import { authRequest } from "./shared";
 
 export interface Prompt {
   id: number;
@@ -32,7 +32,6 @@ export interface PaginatedPromptsResponse {
 
 export const promptsApi = {
   async getPrompts(
-    accessToken: string,
     page: number = 1,
     itemsPerPage: number = 50,
     sport?: string
@@ -46,48 +45,31 @@ export const promptsApi = {
       params.append("sport", sport);
     }
 
-    return apiRequest<PaginatedPromptsResponse>(
+    return authRequest<PaginatedPromptsResponse>(
       `${config.apiBaseUrl}/api/v1/prompts?${params}`,
       {
         cache: "no-store",
-      },
-      accessToken
+      }
     );
   },
 
-  async createPrompt(accessToken: string, prompt: PromptCreate): Promise<Prompt> {
-    return apiRequest<Prompt>(
-      `${config.apiBaseUrl}/api/v1/prompts`,
-      {
-        method: "POST",
-        body: JSON.stringify(prompt),
-      },
-      accessToken
-    );
+  async createPrompt(prompt: PromptCreate): Promise<Prompt> {
+    return authRequest<Prompt>(`${config.apiBaseUrl}/api/v1/prompts`, {
+      method: "POST",
+      body: JSON.stringify(prompt),
+    });
   },
 
-  async updatePrompt(
-    accessToken: string,
-    id: number,
-    prompt: PromptUpdate
-  ): Promise<Prompt> {
-    return apiRequest<Prompt>(
-      `${config.apiBaseUrl}/api/v1/prompts/${id}`,
-      {
-        method: "PATCH",
-        body: JSON.stringify(prompt),
-      },
-      accessToken
-    );
+  async updatePrompt(id: number, prompt: PromptUpdate): Promise<Prompt> {
+    return authRequest<Prompt>(`${config.apiBaseUrl}/api/v1/prompts/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(prompt),
+    });
   },
 
-  async deletePrompt(accessToken: string, id: number): Promise<void> {
-    await apiRequest<void>(
-      `${config.apiBaseUrl}/api/v1/prompts/${id}`,
-      {
-        method: "DELETE",
-      },
-      accessToken
-    );
+  async deletePrompt(id: number): Promise<void> {
+    await authRequest<void>(`${config.apiBaseUrl}/api/v1/prompts/${id}`, {
+      method: "DELETE",
+    });
   },
 };

@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/contexts/UserContext";
 
 const ProfilePage: React.FC = () => {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { user } = useUser();
   const [isEditMode, setIsEditMode] = useState(true);
   const [profileImageUrl, setProfileImageUrl] = useState<string>("");
@@ -18,11 +18,11 @@ const ProfilePage: React.FC = () => {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!authState.accessToken) return;
+      if (!isAuthenticated) return;
 
       try {
         setLoading(true);
-        const data = await profileApi.getProfile(authState.accessToken);
+        const data = await profileApi.getProfile();
         setProfileImageUrl(data.profileImageUrl);
       } catch (err) {
         console.error("Failed to load profile:", err);
@@ -32,7 +32,7 @@ const ProfilePage: React.FC = () => {
     };
 
     loadProfile();
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   const handleImageUpdate = (newUrl: string) => {
     setProfileImageUrl(newUrl);

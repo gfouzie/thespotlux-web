@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { apiRequest } from "./shared";
+import { authRequest } from "./shared";
 import type {
   UserTeam,
   UserTeamFull,
@@ -15,7 +15,7 @@ export const userTeamsApi = {
    * Get all teams for the current authenticated user with basic info (IDs only)
    */
   getUserTeams: async (): Promise<UserTeam[]> => {
-    return apiRequest<UserTeam[]>(`${config.apiBaseUrl}/api/v1/user/teams`);
+    return authRequest<UserTeam[]>(`${config.apiBaseUrl}/api/v1/user/teams`);
   },
 
   /**
@@ -24,7 +24,7 @@ export const userTeamsApi = {
    * for multiple requests to fetch team and league details separately.
    */
   getUserTeamsFull: async (): Promise<UserTeamFull[]> => {
-    return apiRequest<UserTeamFull[]>(
+    return authRequest<UserTeamFull[]>(
       `${config.apiBaseUrl}/api/v1/user/teams/full`
     );
   },
@@ -33,7 +33,7 @@ export const userTeamsApi = {
    * Get all teams for a specific user by user ID with basic info (IDs only)
    */
   getUserTeamsByUserId: async (userId: number): Promise<UserTeam[]> => {
-    return apiRequest<UserTeam[]>(
+    return authRequest<UserTeam[]>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/teams`
     );
   },
@@ -44,7 +44,7 @@ export const userTeamsApi = {
    * for multiple requests to fetch team and league details separately.
    */
   getUserTeamsByUserIdFull: async (userId: number): Promise<UserTeamFull[]> => {
-    return apiRequest<UserTeamFull[]>(
+    return authRequest<UserTeamFull[]>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/teams/full`
     );
   },
@@ -53,7 +53,7 @@ export const userTeamsApi = {
    * Get a specific user team by ID
    */
   getUserTeam: async (userTeamId: number): Promise<UserTeam> => {
-    return apiRequest<UserTeam>(
+    return authRequest<UserTeam>(
       `${config.apiBaseUrl}/api/v1/user/teams/${userTeamId}`
     );
   },
@@ -62,7 +62,7 @@ export const userTeamsApi = {
    * Create a new user team for the current user
    */
   createUserTeam: async (teamData: UserTeamCreate): Promise<UserTeam> => {
-    return apiRequest<UserTeam>(`${config.apiBaseUrl}/api/v1/user/teams`, {
+    return authRequest<UserTeam>(`${config.apiBaseUrl}/api/v1/user/teams`, {
       method: "POST",
       body: JSON.stringify(teamData),
     });
@@ -75,7 +75,7 @@ export const userTeamsApi = {
     userTeamId: number,
     teamData: UserTeamUpdate
   ): Promise<UserTeam> => {
-    return apiRequest<UserTeam>(
+    return authRequest<UserTeam>(
       `${config.apiBaseUrl}/api/v1/user/teams/${userTeamId}`,
       {
         method: "PATCH",
@@ -88,7 +88,7 @@ export const userTeamsApi = {
    * Delete a user team
    */
   deleteUserTeam: async (userTeamId: number): Promise<void> => {
-    return apiRequest<void>(
+    return authRequest<void>(
       `${config.apiBaseUrl}/api/v1/user/teams/${userTeamId}`,
       {
         method: "DELETE",

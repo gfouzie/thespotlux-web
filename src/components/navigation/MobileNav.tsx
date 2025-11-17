@@ -14,7 +14,7 @@ interface MobileNavProps {
 }
 
 const MobileNav = ({ className = "" }: MobileNavProps) => {
-  const { authState, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const { theme } = useTheme();
@@ -40,7 +40,7 @@ const MobileNav = ({ className = "" }: MobileNavProps) => {
     return pathname.startsWith(href);
   };
 
-  if (!authState.isAuthenticated) {
+  if (!isAuthenticated) {
     return null;
   }
 

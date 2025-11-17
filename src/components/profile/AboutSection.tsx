@@ -66,7 +66,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
 );
 
 const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -88,11 +88,11 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!authState.accessToken) return;
+      if (!isAuthenticated) return;
 
       try {
         setLoading(true);
-        const data = await profileApi.getProfile(authState.accessToken);
+        const data = await profileApi.getProfile();
         setProfile(data);
         // Initialize edit values with current profile data
         setEditValues({
@@ -110,7 +110,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
     };
 
     loadProfile();
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   // Check for changes whenever edit values change
   useEffect(() => {
@@ -134,7 +134,7 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
   };
 
   const handleSave = async () => {
-    if (!authState.accessToken || !profile || !hasChanges) return;
+    if (!isAuthenticated || !profile || !hasChanges) return;
 
     try {
       setSaving(true);
@@ -149,10 +149,10 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
       };
 
       // Call API to update
-      await profileApi.updateProfile(authState.accessToken, updateData);
+      await profileApi.updateProfile(updateData);
 
       // Fetch updated profile after successful update
-      const updatedProfile = await profileApi.getProfile(authState.accessToken);
+      const updatedProfile = await profileApi.getProfile();
 
       // Update local state
       setProfile(updatedProfile);

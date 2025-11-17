@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { apiRequest } from "./shared";
+import { apiRequest, authRequest } from "./shared";
 import { authApi, type LoginResponse } from "./auth";
 
 /**
@@ -49,7 +49,7 @@ export interface PaginatedUsersResponse {
  */
 export const userApi = {
   /**
-   * Register a new user
+   * Register a new user (public endpoint)
    */
   register: async (userData: RegisterUserData): Promise<User> => {
     return apiRequest<User>(`${config.apiBaseUrl}/api/v1/user`, {
@@ -59,7 +59,7 @@ export const userApi = {
   },
 
   /**
-   * Register and auto-login user
+   * Register and auto-login user (public endpoint)
    */
   registerAndLogin: async (
     userData: RegisterUserData
@@ -75,7 +75,7 @@ export const userApi = {
   },
 
   /**
-   * Get available user roles
+   * Get available user roles (public endpoint)
    */
   getRoles: async (): Promise<{
     roles: Record<number, string>;
@@ -85,7 +85,7 @@ export const userApi = {
   },
 
   /**
-   * Get user by username (convenience endpoint)
+   * Get user by username (public endpoint)
    */
   getUserByUsername: async (username: string): Promise<User> => {
     return apiRequest<User>(
@@ -94,10 +94,9 @@ export const userApi = {
   },
 
   /**
-   * Get paginated list of users with optional search
+   * Get paginated list of users with optional search (authenticated)
    */
   getUsers: async (
-    accessToken: string,
     page: number = 1,
     itemsPerPage: number = 20,
     search?: string
@@ -111,12 +110,11 @@ export const userApi = {
       params.append("search", search);
     }
 
-    return apiRequest<PaginatedUsersResponse>(
+    return authRequest<PaginatedUsersResponse>(
       `${config.apiBaseUrl}/api/v1/users?${params}`,
       {
         cache: "no-store",
-      },
-      accessToken
+      }
     );
   },
 };

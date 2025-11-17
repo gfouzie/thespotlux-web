@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { apiRequest } from "./shared";
+import { authRequest } from "./shared";
 
 /**
  * User profile interface
@@ -34,25 +34,19 @@ export interface ProfileUpdateRequest {
 }
 
 export const profileApi = {
-  async getProfile(accessToken: string): Promise<UserProfile> {
-    return apiRequest<UserProfile>(
-      `${config.apiBaseUrl}/api/v1/user/me/`,
-      {},
-      accessToken
-    );
+  async getProfile(): Promise<UserProfile> {
+    return authRequest<UserProfile>(`${config.apiBaseUrl}/api/v1/user/me/`, {});
   },
 
   async updateProfile(
-    accessToken: string,
     updateData: ProfileUpdateRequest
   ): Promise<{ message: string }> {
-    return apiRequest<{ message: string }>(
+    return authRequest<{ message: string }>(
       `${config.apiBaseUrl}/api/v1/user/me`,
       {
         method: "PATCH",
         body: JSON.stringify(updateData),
-      },
-      accessToken
+      }
     );
   },
 };

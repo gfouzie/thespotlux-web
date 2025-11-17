@@ -15,7 +15,7 @@ import Alert from "@/components/common/Alert";
 
 export default function PromptsPage() {
   const { isLoading: userLoading, isSuperuser } = useUser();
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
@@ -33,19 +33,19 @@ export default function PromptsPage() {
   });
 
   const loadPrompts = useCallback(async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
-      const response = await promptsApi.getPrompts(authState.accessToken);
+      const response = await promptsApi.getPrompts();
       setPrompts(response.data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load prompts");
     } finally {
       setIsLoading(false);
     }
-  }, [authState.accessToken]);
+  }, [isAuthenticated]);
 
   const loadSports = useCallback(async () => {
     try {
@@ -56,7 +56,7 @@ export default function PromptsPage() {
 
       // Set default sport for form if not already set
       if (sportValues.length > 0 && !formData.sport) {
-        setFormData(prev => ({ ...prev, sport: sportValues[0] }));
+        setFormData((prev) => ({ ...prev, sport: sportValues[0] }));
       }
     } catch (err) {
       console.error("Failed to load sports:", err);
@@ -71,15 +71,15 @@ export default function PromptsPage() {
   }, [userLoading, isSuperuser, router]);
 
   useEffect(() => {
-    if (authState.accessToken && isSuperuser) {
+    if (isAuthenticated && isSuperuser) {
       loadPrompts();
       loadSports();
     }
-  }, [authState.accessToken, isSuperuser, loadPrompts, loadSports]);
+  }, [isAuthenticated, isSuperuser, loadPrompts, loadSports]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setError(null);
@@ -88,7 +88,7 @@ export default function PromptsPage() {
         sport: formData.sport,
         description: formData.description || undefined,
       };
-      await promptsApi.createPrompt(authState.accessToken, promptData);
+      await promptsApi.createPrompt(promptData);
       setFormData({ name: "", sport: sports[0] || "", description: "" });
       setShowCreateForm(false);
       await loadPrompts();
@@ -99,11 +99,11 @@ export default function PromptsPage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!authState.accessToken || editingId === null) return;
+    if (!isAuthenticated || editingId === null) return;
 
     try {
       setError(null);
-      await promptsApi.updatePrompt(authState.accessToken, editingId, {
+      await promptsApi.updatePrompt(editingId, {
         name: formData.name,
         sport: formData.sport,
         description: formData.description || undefined,
@@ -117,12 +117,12 @@ export default function PromptsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
     if (!confirm("Are you sure you want to delete this prompt?")) return;
 
     try {
       setError(null);
-      await promptsApi.deletePrompt(authState.accessToken, id);
+      await promptsApi.deletePrompt(id);
       await loadPrompts();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete prompt");
@@ -163,7 +163,9 @@ export default function PromptsPage() {
     <AuthenticatedLayout>
       <div className="max-w-6xl mx-auto p-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-text-col">Prompts Management</h1>
+          <h1 className="text-2xl font-bold text-text-col">
+            Prompts Management
+          </h1>
           {!showCreateForm && !editingId && (
             <Button onClick={() => setShowCreateForm(true)}>
               Create New Prompt
@@ -237,7 +239,7 @@ export default function PromptsPage() {
           <div className="text-center text-text-col">Loading prompts...</div>
         ) : prompts.length === 0 ? (
           <div className="text-center text-text-col">
-            No prompts found. Create your first prompt!
+            No prompts yet. Create one to get started!
           </div>
         ) : (
           <div className="space-y-2">
@@ -248,29 +250,29 @@ export default function PromptsPage() {
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-text-col">{prompt.name}</h3>
-                    <p className="text-sm text-text-col/70">
-                      Sport: {prompt.sport.charAt(0).toUpperCase() + prompt.sport.slice(1)}
-                    </p>
+                    <h3 className="text-lg font-semibold text-text-col">
+                      {prompt.name}
+                    </h3>
+                    <div className="text-sm text-text-col/60 mt-1">
+                      Sport: {prompt.sport}
+                    </div>
                     {prompt.description && (
-                      <p className="text-sm text-text-col mt-1">{prompt.description}</p>
+                      <p className="text-text-col/80 mt-2">
+                        {prompt.description}
+                      </p>
                     )}
-                    <p className="text-xs text-text-col/50 mt-2">
+                    <div className="text-xs text-text-col/50 mt-2">
                       Created: {new Date(prompt.createdAt).toLocaleDateString()}
-                    </p>
+                    </div>
                   </div>
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => startEdit(prompt)}
-                      variant="secondary"
-                      size="sm"
-                    >
+                  <div className="flex gap-2 ml-4">
+                    <Button size="sm" onClick={() => startEdit(prompt)}>
                       Edit
                     </Button>
                     <Button
-                      onClick={() => handleDelete(prompt.id)}
-                      variant="danger"
                       size="sm"
+                      variant="secondary"
+                      onClick={() => handleDelete(prompt.id)}
                     >
                       Delete
                     </Button>

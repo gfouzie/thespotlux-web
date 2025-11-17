@@ -1,30 +1,30 @@
 import { config } from "@/lib/config";
-import { ApiError } from "./shared";
+import { ApiError, getToken } from "./shared";
 import { keysToCamel } from "@/lib/caseConversion";
 
 /**
  * Upload-specific request handler that doesn't set Content-Type for FormData
  * Automatically converts response data from snake_case to camelCase
- * @param url - The URL to fetch
- * @param options - Fetch options (method, body, headers, etc.)
- * @param accessToken - Optional JWT access token (will be added as Bearer token)
+ * Automatically adds auth token from the token provider
  */
 const uploadRequest = async <T>(
   url: string,
-  options: RequestInit = {},
-  accessToken?: string
+  options: RequestInit = {}
 ): Promise<T> => {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 seconds
 
-  // Build headers with automatic Authorization if accessToken provided
+  // Get token from the global provider
+  const token = getToken();
+  if (!token) {
+    throw new ApiError("Not authenticated", 401);
+  }
+
+  // Build headers with Authorization
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
+    Authorization: `Bearer ${token}`,
   };
-
-  if (accessToken) {
-    headers.Authorization = `Bearer ${accessToken}`;
-  }
 
   try {
     const response = await fetch(url, {
@@ -152,8 +152,7 @@ export const uploadApi = {
    * Upload profile picture (convenience method)
    */
   uploadProfilePicture: async (
-    file: File,
-    accessToken: string
+    file: File
   ): Promise<ProfilePictureUploadResponse> => {
     const formData = new FormData();
     formData.append("file", file);
@@ -163,23 +162,19 @@ export const uploadApi = {
       {
         method: "POST",
         body: formData,
-      },
-      accessToken
+      }
     );
   },
 
   /**
    * Delete profile picture (convenience method)
    */
-  deleteProfilePicture: async (
-    accessToken: string
-  ): Promise<{ message: string }> => {
+  deleteProfilePicture: async (): Promise<{ message: string }> => {
     return uploadRequest<{ message: string }>(
       `${config.apiBaseUrl}/api/v1/upload/profile-picture`,
       {
         method: "DELETE",
-      },
-      accessToken
+      }
     );
   },
 

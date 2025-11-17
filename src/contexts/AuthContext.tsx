@@ -9,6 +9,7 @@ import {
   ReactNode,
 } from "react";
 import { authApi, type LoginResponse, type LoginCredentials } from "@/api";
+import { setTokenProvider } from "@/api/client";
 
 // Auth state interface
 interface AuthState {
@@ -26,9 +27,12 @@ type AuthAction =
   | { type: "LOGOUT" }
   | { type: "TOKEN_REFRESH"; token: string };
 
-// Auth context interface
+// Auth context interface - flattened for clean destructuring
 interface AuthContextType {
-  authState: AuthState;
+  isAuthenticated: boolean;
+  accessToken: string | null;
+  isLoading: boolean;
+  error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   setAccessToken: (token: string) => void;
@@ -84,6 +88,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Auth provider component
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
+
+  setTokenProvider(() => state.accessToken);
 
   // Store access token in memory (not localStorage for security)
   const setAccessToken = useCallback((token: string) => {
@@ -154,7 +160,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [state.isAuthenticated]);
 
   const value: AuthContextType = {
-    authState: state,
+    // Flatten state for clean destructuring in components
+    isAuthenticated: state.isAuthenticated,
+    accessToken: state.accessToken,
+    isLoading: state.isLoading,
+    error: state.error,
     login,
     logout,
     setAccessToken,

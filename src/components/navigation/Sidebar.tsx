@@ -17,7 +17,7 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ className = "" }: SidebarProps) => {
-  const { authState, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { isSuperuser } = useUser();
   const router = useRouter();
   const pathname = usePathname();
@@ -86,7 +86,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
     </Link>
   );
 
-  if (!authState.isAuthenticated) {
+  if (!isAuthenticated) {
     return null;
   }
 

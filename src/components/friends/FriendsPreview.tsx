@@ -12,20 +12,20 @@ interface FriendsPreviewProps {
 }
 
 export default function FriendsPreview({ userId, isOwnProfile = false }: FriendsPreviewProps) {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [friends, setFriends] = useState<UserProfile[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (authState.accessToken) {
+    if (isAuthenticated) {
       loadFriends();
     }
-  }, [authState.accessToken, userId]);
+  }, [isAuthenticated, userId]);
 
   const loadFriends = async () => {
-    if (!authState.accessToken) return;
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
@@ -33,8 +33,8 @@ export default function FriendsPreview({ userId, isOwnProfile = false }: Friends
 
       // Load first 6 friends for preview
       const response: PaginatedUsersResponse = isOwnProfile
-        ? await friendshipsApi.getMyFriends(authState.accessToken, 1, 6)
-        : await friendshipsApi.getUserFriends(authState.accessToken, userId, 1, 6);
+        ? await friendshipsApi.getMyFriends(1, 6)
+        : await friendshipsApi.getUserFriends(userId, 1, 6);
 
       setFriends(response.data);
       setTotalCount(response.totalCount);

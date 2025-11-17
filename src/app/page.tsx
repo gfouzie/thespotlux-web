@@ -8,13 +8,13 @@ import UnauthenticatedLayout from "@/components/layout/UnauthenticatedLayout";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
-  const { authState } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
-  if (authState.isLoading) {
+  if (isLoading) {
     return <LoadingState />;
   }
 
-  if (authState.isAuthenticated) {
+  if (isAuthenticated) {
     return (
       <AuthenticatedLayout>
         <Dashboard />

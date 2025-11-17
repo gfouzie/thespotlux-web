@@ -22,12 +22,12 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { authState } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
 
-  const fetchUserData = useCallback(async (accessToken: string) => {
+  const fetchUserData = useCallback(async () => {
     try {
       setIsLoading(true);
-      const userData = await profileApi.getProfile(accessToken);
+      const userData = await profileApi.getProfile();
       setUser(userData);
     } catch (error) {
       console.error("Failed to fetch user data:", error);
@@ -38,22 +38,21 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const refreshUser = useCallback(async () => {
-    if (authState.accessToken) {
-      await fetchUserData(authState.accessToken);
+    if (isAuthenticated) {
+      await fetchUserData();
     }
-  }, [authState.accessToken, fetchUserData]);
+  }, [isAuthenticated, fetchUserData]);
 
   useEffect(() => {
-    if (authState.isAuthenticated && authState.accessToken) {
-      fetchUserData(authState.accessToken);
-    } else if (!authState.isLoading) {
+    if (isAuthenticated) {
+      fetchUserData();
+    } else if (!authLoading) {
       setUser(null);
       setIsLoading(false);
     }
   }, [
-    authState.isAuthenticated,
-    authState.accessToken,
-    authState.isLoading,
+    isAuthenticated,
+    authLoading,
     fetchUserData,
   ]);
 

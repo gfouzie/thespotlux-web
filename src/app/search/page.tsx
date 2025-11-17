@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUser } from "@/contexts/UserContext";
-import { userApi, type User, type PaginatedUsersResponse } from "@/api/user";
-import { friendshipsApi, type PaginatedUsersResponse as FriendsPaginatedResponse } from "@/api/friendships";
+import { userApi, type User } from "@/api/user";
+import { friendshipsApi } from "@/api/friendships";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import SearchInput from "@/components/search/SearchInput";
 import UserList from "@/components/search/UserList";
@@ -15,7 +15,7 @@ import Alert from "@/components/common/Alert";
 type TabType = "all" | "friends";
 
 export default function SearchPage() {
-  const { authState } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { user: currentUser } = useUser();
   const [activeTab, setActiveTab] = useState<TabType>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,34 +23,18 @@ export default function SearchPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
+  const [friendsCount, setFriendsCount] = useState(0);
   const [itemsPerPage] = useState(20);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load users when search or page changes
-  useEffect(() => {
-    if (authState.accessToken) {
-      if (activeTab === "all") {
-        loadUsers();
-      } else {
-        loadFriends();
-      }
-    }
-  }, [authState.accessToken, debouncedSearch, page, activeTab]);
-
-  // Reset page when search changes
-  useEffect(() => {
-    setPage(1);
-  }, [debouncedSearch]);
-
-  const loadUsers = async () => {
-    if (!authState.accessToken) return;
+  const loadUsers = useCallback(async () => {
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
       const response = await userApi.getUsers(
-        authState.accessToken,
         page,
         itemsPerPage,
         debouncedSearch || undefined
@@ -62,34 +46,82 @@ export default function SearchPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAuthenticated, page, itemsPerPage, debouncedSearch]);
 
-  const loadFriends = async () => {
-    if (!authState.accessToken) return;
+  const loadFriends = useCallback(async () => {
+    if (!isAuthenticated) return;
 
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getMyFriends(
-        authState.accessToken,
-        page,
-        itemsPerPage
-      );
+      const response = await friendshipsApi.getMyFriends(page, itemsPerPage);
       setUsers(response.data);
       setTotalCount(response.totalCount);
+      setFriendsCount(response.totalCount);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load friends");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [isAuthenticated, page, itemsPerPage]);
 
-  const handleStatusChange = () => {
+  // Load friends count on mount
+  useEffect(() => {
+    const loadFriendsCount = async () => {
+      if (!isAuthenticated) return;
+      try {
+        const response = await friendshipsApi.getMyFriends(
+          1,
+          1 // Only need the count, not the data
+        );
+        setFriendsCount(response.totalCount);
+      } catch (err) {
+        console.error("Failed to load friends count:", err);
+      }
+    };
+
+    loadFriendsCount();
+  }, [isAuthenticated]);
+
+  // Load users when search or page changes
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (activeTab === "all") {
+        loadUsers();
+      } else {
+        loadFriends();
+      }
+    }
+  }, [
+    isAuthenticated,
+    debouncedSearch,
+    page,
+    activeTab,
+    loadUsers,
+    loadFriends,
+  ]);
+
+  // Reset page when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  const handleStatusChange = async () => {
     // Reload the current list when friendship status changes
     if (activeTab === "all") {
       loadUsers();
     } else {
       loadFriends();
+    }
+
+    // Also reload friends count to keep it accurate
+    if (isAuthenticated) {
+      try {
+        const response = await friendshipsApi.getMyFriends(1, 1);
+        setFriendsCount(response.totalCount);
+      } catch (err) {
+        console.error("Failed to reload friends count:", err);
+      }
     }
   };
 
@@ -143,8 +175,8 @@ export default function SearchPage() {
                   onClick={() => handleTabChange("all")}
                   className={`pb-2 px-4 ${
                     activeTab === "all"
-                      ? "border-b-2 border-accent-col text-text-col"
-                      : "text-text-col/60 hover:text-text-col"
+                      ? "border-b-2 border-accent-col text-text-col cursor-pointer"
+                      : "text-text-col/60 hover:text-text-col cursor-pointer"
                   }`}
                 >
                   All Users
@@ -153,11 +185,11 @@ export default function SearchPage() {
                   onClick={() => handleTabChange("friends")}
                   className={`pb-2 px-4 ${
                     activeTab === "friends"
-                      ? "border-b-2 border-accent-col text-text-col"
-                      : "text-text-col/60 hover:text-text-col"
+                      ? "border-b-2 border-accent-col text-text-col cursor-pointer"
+                      : "text-text-col/60 hover:text-text-col cursor-pointer"
                   }`}
                 >
-                  Friends ({totalCount})
+                  Friends ({friendsCount})
                 </button>
               </div>
 
