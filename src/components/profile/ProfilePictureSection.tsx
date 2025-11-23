@@ -6,17 +6,39 @@ import { uploadApi } from "@/api/upload";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface ProfilePictureSectionProps {
-  profileImageUrl: string;
-  onImageUpdate: (newUrl: string) => void;
+  profileImageUrl: string | null;
+  firstName: string | null;
+  lastName: string | null;
+  onImageUpdate: (newUrl: string | null) => void;
   isEditMode: boolean;
 }
 
+/**
+ * Get user initials for placeholder
+ */
+const getUserInitials = (firstName: string | null, lastName: string | null): string => {
+  const first = firstName?.trim() || "";
+  const last = lastName?.trim() || "";
+
+  if (first && last) {
+    return (first[0] + last[0]).toUpperCase();
+  } else if (first) {
+    return first.substring(0, 2).toUpperCase();
+  } else if (last) {
+    return last.substring(0, 2).toUpperCase();
+  }
+  return "??";
+};
+
 const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   profileImageUrl,
+  firstName,
+  lastName,
   onImageUpdate,
   isEditMode,
 }) => {
   const { isAuthenticated } = useAuth();
+  const initials = getUserInitials(firstName, lastName);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -73,7 +95,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
 
       await uploadApi.deleteProfilePicture();
 
-      onImageUpdate("https://profileimageurl.com");
+      onImageUpdate(null);
       setShowDeleteConfirm(false);
     } catch (err) {
       setError(
@@ -98,15 +120,19 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
         {/* Profile Picture Display */}
         <div className="relative group">
           <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-component-col bg-component-col">
-            <img
-              src={profileImageUrl}
-              alt="Profile"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = "https://via.placeholder.com/160?text=No+Image";
-              }}
-            />
+            {profileImageUrl ? (
+              <img
+                src={profileImageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-accent-col/20">
+                <span className="text-5xl font-semibold text-text-col">
+                  {initials}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Edit Overlay (only in edit mode) */}
@@ -142,7 +168,7 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
                 <span>Upload New</span>
               </button>
 
-            {profileImageUrl && profileImageUrl !== "https://profileimageurl.com" && (
+            {profileImageUrl && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={uploading}

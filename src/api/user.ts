@@ -25,7 +25,7 @@ export interface User {
   lastName: string | null;
   username: string;
   email: string;
-  profileImageUrl: string;
+  profileImageUrl: string | null;
   birthday: string | null;
   height: number | null;
   weight: number | null;
@@ -49,10 +49,10 @@ export interface PaginatedUsersResponse {
  */
 export const userApi = {
   /**
-   * Register a new user (public endpoint)
+   * Register a new user and return auth tokens (public endpoint)
    */
-  register: async (userData: RegisterUserData): Promise<User> => {
-    return apiRequest<User>(`${config.apiBaseUrl}/api/v1/user`, {
+  register: async (userData: RegisterUserData): Promise<LoginResponse> => {
+    return apiRequest<LoginResponse>(`${config.apiBaseUrl}/api/v1/user`, {
       method: "POST",
       body: JSON.stringify(userData),
     });
@@ -60,18 +60,12 @@ export const userApi = {
 
   /**
    * Register and auto-login user (public endpoint)
+   * Now just an alias for register since signup returns tokens directly
    */
   registerAndLogin: async (
     userData: RegisterUserData
   ): Promise<LoginResponse> => {
-    // First register the user
-    await userApi.register(userData);
-
-    // Then login with the same credentials
-    return authApi.login({
-      email: userData.email,
-      password: userData.password,
-    });
+    return userApi.register(userData);
   },
 
   /**

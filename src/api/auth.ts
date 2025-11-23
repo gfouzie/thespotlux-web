@@ -14,6 +14,7 @@ export interface LoginCredentials {
  */
 export interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
   tokenType: string;
 }
 
@@ -31,7 +32,6 @@ export const authApi = {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(credentials),
-      credentials: "include", // Include cookies for refresh token
     });
   },
 
@@ -43,19 +43,21 @@ export const authApi = {
       `${config.apiBaseUrl}/api/v1/logout`,
       {
         method: "POST",
-        credentials: "include", // Include cookies for refresh token
       },
       accessToken
     );
   },
 
   /**
-   * Refresh access token
+   * Refresh access token using refresh token
    */
-  refresh: async (): Promise<LoginResponse> => {
+  refresh: async (refreshToken: string): Promise<LoginResponse> => {
     return apiRequest<LoginResponse>(`${config.apiBaseUrl}/api/v1/refresh`, {
       method: "POST",
-      credentials: "include", // Include cookies for refresh token
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ refreshToken }),
     });
   },
 };

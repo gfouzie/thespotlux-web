@@ -13,7 +13,7 @@ const ProfilePage: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { user } = useUser();
   const [isEditMode, setIsEditMode] = useState(true);
-  const [profileImageUrl, setProfileImageUrl] = useState<string>("");
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +34,7 @@ const ProfilePage: React.FC = () => {
     loadProfile();
   }, [isAuthenticated]);
 
-  const handleImageUpdate = (newUrl: string) => {
+  const handleImageUpdate = (newUrl: string | null) => {
     setProfileImageUrl(newUrl);
   };
 
@@ -68,6 +68,8 @@ const ProfilePage: React.FC = () => {
             <div className="space-y-6">
               <ProfilePictureSection
                 profileImageUrl={profileImageUrl}
+                firstName={user?.firstName || null}
+                lastName={user?.lastName || null}
                 onImageUpdate={handleImageUpdate}
                 isEditMode={isEditMode}
               />

@@ -15,6 +15,7 @@ import { setTokenProvider } from "@/api/client";
 interface AuthState {
   isAuthenticated: boolean;
   accessToken: string | null;
+  refreshToken: string | null;
   isLoading: boolean;
   error: string | null;
 }
@@ -23,25 +24,27 @@ interface AuthState {
 type AuthAction =
   | { type: "SET_LOADING"; loading: boolean }
   | { type: "SET_ERROR"; error: string | null }
-  | { type: "LOGIN_SUCCESS"; token: string }
+  | { type: "LOGIN_SUCCESS"; accessToken: string; refreshToken: string }
   | { type: "LOGOUT" }
-  | { type: "TOKEN_REFRESH"; token: string };
+  | { type: "TOKEN_REFRESH"; accessToken: string; refreshToken: string };
 
 // Auth context interface - flattened for clean destructuring
 interface AuthContextType {
   isAuthenticated: boolean;
   accessToken: string | null;
+  refreshToken: string | null;
   isLoading: boolean;
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
-  setAccessToken: (token: string) => void;
+  setTokens: (accessToken: string, refreshToken: string) => void;
 }
 
 // Initial state
 const initialState: AuthState = {
   isAuthenticated: false,
   accessToken: null,
+  refreshToken: null,
   isLoading: true, // Start with loading to check for existing auth
   error: null,
 };
@@ -57,7 +60,8 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
       return {
         ...state,
         isAuthenticated: true,
-        accessToken: action.token,
+        accessToken: action.accessToken,
+        refreshToken: action.refreshToken,
         isLoading: false,
         error: null,
       };
@@ -66,13 +70,15 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
         ...state,
         isAuthenticated: false,
         accessToken: null,
+        refreshToken: null,
         isLoading: false,
         error: null,
       };
     case "TOKEN_REFRESH":
       return {
         ...state,
-        accessToken: action.token,
+        accessToken: action.accessToken,
+        refreshToken: action.refreshToken,
         isAuthenticated: true,
         isLoading: false,
         error: null,
@@ -91,9 +97,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   setTokenProvider(() => state.accessToken);
 
-  // Store access token in memory (not localStorage for security)
-  const setAccessToken = useCallback((token: string) => {
-    dispatch({ type: "LOGIN_SUCCESS", token });
+  // Store tokens in memory (not localStorage for security)
+  const setTokens = useCallback((accessToken: string, refreshToken: string) => {
+    dispatch({ type: "LOGIN_SUCCESS", accessToken, refreshToken });
   }, []);
 
   // Login function
@@ -103,7 +109,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       dispatch({ type: "SET_ERROR", error: null });
 
       const response = await authApi.login(credentials);
-      dispatch({ type: "LOGIN_SUCCESS", token: response.accessToken });
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        accessToken: response.accessToken,
+        refreshToken: response.refreshToken
+      });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : "Login failed";
@@ -126,15 +136,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [state.accessToken]);
 
-  // Auto-refresh token on mount
+  // Auto-refresh token on mount (if refresh token exists in sessionStorage)
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Try to refresh token using the HTTP-only cookie
-        const response = await authApi.refresh();
-        dispatch({ type: "TOKEN_REFRESH", token: response.accessToken });
+        // Try to get refresh token from sessionStorage
+        const storedRefreshToken = sessionStorage.getItem("refreshToken");
+        if (storedRefreshToken) {
+          const response = await authApi.refresh(storedRefreshToken);
+          dispatch({
+            type: "TOKEN_REFRESH",
+            accessToken: response.accessToken,
+            refreshToken: response.refreshToken
+          });
+        } else {
+          // No refresh token, user is not authenticated
+          dispatch({ type: "LOGOUT" });
+        }
       } catch (error) {
-        // No valid refresh token, user is not authenticated
+        // Invalid or expired refresh token
+        sessionStorage.removeItem("refreshToken");
         dispatch({ type: "LOGOUT" });
       }
     };
@@ -142,14 +163,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initializeAuth();
   }, []);
 
+  // Store refresh token in sessionStorage when it changes
+  useEffect(() => {
+    if (state.refreshToken) {
+      sessionStorage.setItem("refreshToken", state.refreshToken);
+    } else {
+      sessionStorage.removeItem("refreshToken");
+    }
+  }, [state.refreshToken]);
+
   // Auto-refresh token before expiration (every 25 minutes)
   useEffect(() => {
-    if (!state.isAuthenticated) return;
+    if (!state.isAuthenticated || !state.refreshToken) return;
 
     const refreshInterval = setInterval(async () => {
       try {
-        const response = await authApi.refresh();
-        dispatch({ type: "TOKEN_REFRESH", token: response.accessToken });
+        const response = await authApi.refresh(state.refreshToken!);
+        dispatch({
+          type: "TOKEN_REFRESH",
+          accessToken: response.accessToken,
+          refreshToken: response.refreshToken
+        });
       } catch (error) {
         console.error("Token refresh failed:", error);
         dispatch({ type: "LOGOUT" });
@@ -157,17 +191,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, 25 * 60 * 1000); // 25 minutes
 
     return () => clearInterval(refreshInterval);
-  }, [state.isAuthenticated]);
+  }, [state.isAuthenticated, state.refreshToken]);
 
   const value: AuthContextType = {
     // Flatten state for clean destructuring in components
     isAuthenticated: state.isAuthenticated,
     accessToken: state.accessToken,
+    refreshToken: state.refreshToken,
     isLoading: state.isLoading,
     error: state.error,
     login,
     logout,
-    setAccessToken,
+    setTokens,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

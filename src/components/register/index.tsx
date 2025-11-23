@@ -72,7 +72,7 @@ const registrationReducer = (state: State, action: Action): State => {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setAccessToken } = useAuth();
+  const { setTokens } = useAuth();
   const [state, dispatch] = useReducer(registrationReducer, initialState);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,8 +117,8 @@ export default function RegisterPage() {
       });
       console.log("User registered and logged in successfully");
 
-      // Set the access token in auth context
-      setAccessToken(loginResponse.accessToken);
+      // Set the tokens in auth context
+      setTokens(loginResponse.accessToken, loginResponse.refreshToken);
 
       // Redirect to dashboard
       router.push("/");

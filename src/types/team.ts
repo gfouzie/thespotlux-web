@@ -23,6 +23,7 @@ export interface Team {
   sport: string;
   leagueId: number | null;
   level: string | null;
+  profileImageUrl: string | null;
   createdAt: string;
 }
 

@@ -179,6 +179,37 @@ export const uploadApi = {
   },
 
   /**
+   * Upload team picture (convenience method)
+   */
+  uploadTeamPicture: async (
+    teamId: number,
+    file: File
+  ): Promise<ProfilePictureUploadResponse> => {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    return uploadRequest<ProfilePictureUploadResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/team-picture/${teamId}`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+  },
+
+  /**
+   * Delete team picture (convenience method)
+   */
+  deleteTeamPicture: async (teamId: number): Promise<{ message: string }> => {
+    return uploadRequest<{ message: string }>(
+      `${config.apiBaseUrl}/api/v1/upload/team-picture/${teamId}`,
+      {
+        method: "DELETE",
+      }
+    );
+  },
+
+  /**
    * Upload prompt video (convenience method)
    */
   uploadPrompt: async (
