@@ -118,11 +118,18 @@ export const apiRequest = async <T>(
 /**
  * Authenticated API request
  * Automatically adds Authorization header with access token
+ * Defaults to cache: "no-store" to ensure fresh data on every request
+ *
+ * @param url - The API endpoint URL
+ * @param options - Fetch options (method, body, headers, etc.)
+ * @param useCache - Set to true to allow browser caching (default: false)
+ *
  * Use for all protected endpoints
  */
 export const authRequest = async <T>(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  useCache: boolean = false
 ): Promise<T> => {
   if (!getAccessToken) {
     throw new ApiError(
@@ -137,6 +144,8 @@ export const authRequest = async <T>(
   }
 
   return baseApiRequest<T>(url, {
+    // Default to no caching unless explicitly requested
+    ...(useCache ? {} : { cache: "no-store" }),
     ...options,
     headers: {
       ...options.headers,

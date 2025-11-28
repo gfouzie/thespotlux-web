@@ -105,10 +105,7 @@ export const userApi = {
     }
 
     return authRequest<PaginatedUsersResponse>(
-      `${config.apiBaseUrl}/api/v1/users?${params}`,
-      {
-        cache: "no-store",
-      }
+      `${config.apiBaseUrl}/api/v1/users?${params}`
     );
   },
 };

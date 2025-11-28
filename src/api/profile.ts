@@ -35,7 +35,7 @@ export interface ProfileUpdateRequest {
 
 export const profileApi = {
   async getProfile(): Promise<UserProfile> {
-    return authRequest<UserProfile>(`${config.apiBaseUrl}/api/v1/user/me/`, {});
+    return authRequest<UserProfile>(`${config.apiBaseUrl}/api/v1/user/me/`);
   },
 
   async updateProfile(
