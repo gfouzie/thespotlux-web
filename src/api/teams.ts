@@ -26,6 +26,35 @@ export interface UpdateTeamData {
 }
 
 /**
+ * Query parameters for fetching teams
+ */
+export interface GetTeamsParams {
+  sport?: string;
+  country?: string;
+  offset?: number;
+  limit?: number;
+  leagueId?: number;
+  searchText?: string;
+}
+
+/**
+ * Response from paginated teams endpoint
+ * Note: Backend currently returns just an array, but this documents the expected structure
+ */
+export interface GetTeamsResponse {
+  /** Array of teams matching the query */
+  teams: Team[];
+  /** Total number of teams returned in this response */
+  count: number;
+  /** Offset used for this query */
+  offset: number;
+  /** Limit used for this query */
+  limit: number;
+  /** Whether more teams are available */
+  hasMore: boolean;
+}
+
+/**
  * API functions for team operations
  */
 export const teamsApi = {
@@ -66,9 +95,19 @@ export const teamsApi = {
   },
 
   /**
-   * Get all teams
+   * Get teams with pagination and filtering
    */
-  getAllTeams: async (): Promise<Team[]> => {
-    return authRequest<Team[]>(`${config.apiBaseUrl}/api/v1/teams`);
+  getTeams: async (params?: GetTeamsParams): Promise<Team[]> => {
+    const queryParams = new URLSearchParams();
+
+    if (params?.sport) queryParams.append("sport", params.sport);
+    if (params?.country) queryParams.append("country", params.country);
+    if (params?.offset !== undefined) queryParams.append("offset", params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append("limit", params.limit.toString());
+    if (params?.leagueId) queryParams.append("league_id", params.leagueId.toString());
+    if (params?.searchText) queryParams.append("searchText", params.searchText);
+
+    const url = `${config.apiBaseUrl}/api/v1/teams${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    return authRequest<Team[]>(url);
   },
 };

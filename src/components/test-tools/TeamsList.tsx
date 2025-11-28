@@ -1,16 +1,20 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { teamsApi } from "@/api/teams";
 import { Team } from "@/types/team";
 import TeamCard from "@/components/team/TeamCard";
 
+const TEAMS_PER_PAGE = 10;
+
 const TeamsList: React.FC = () => {
   const [teams, setTeams] = useState<Team[]>([]);
-  const [filteredTeams, setFilteredTeams] = useState<Team[]>([]);
   const [selectedSport, setSelectedSport] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [offset, setOffset] = useState(0);
 
   const sports = [
     "all",
@@ -24,39 +28,59 @@ const TeamsList: React.FC = () => {
     "golf",
   ];
 
-  useEffect(() => {
-    loadTeams();
-  }, []);
-
-  useEffect(() => {
-    if (!teams || teams.length === 0) {
-      setFilteredTeams([]);
-      return;
-    }
-
-    if (selectedSport === "all") {
-      setFilteredTeams(teams);
-    } else {
-      setFilteredTeams(teams.filter((team) => team.sport === selectedSport));
-    }
-  }, [selectedSport, teams]);
-
-  const loadTeams = async () => {
+  const loadTeams = useCallback(async (currentOffset: number, isNewFilter: boolean = false) => {
     try {
-      setLoading(true);
+      if (isNewFilter) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
       setError(null);
-      const teams = await teamsApi.getAllTeams();
-      setTeams(teams);
-      setFilteredTeams(teams);
+
+      const params = {
+        sport: selectedSport === "all" ? undefined : selectedSport,
+        offset: currentOffset,
+        limit: TEAMS_PER_PAGE,
+      };
+
+      const newTeams = await teamsApi.getTeams(params);
+
+      if (isNewFilter) {
+        setTeams(newTeams);
+      } else {
+        setTeams((prev) => [...prev, ...newTeams]);
+      }
+
+      // If we got fewer teams than requested, there are no more teams to load
+      setHasMore(newTeams.length === TEAMS_PER_PAGE);
+      setOffset(currentOffset + newTeams.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load teams");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  }, [selectedSport]);
+
+  // Reset and load teams when sport filter changes
+  useEffect(() => {
+    setTeams([]);
+    setOffset(0);
+    setHasMore(true);
+    loadTeams(0, true);
+  }, [selectedSport, loadTeams]);
+
+  const handleLoadMore = () => {
+    if (!loadingMore && hasMore) {
+      loadTeams(offset, false);
     }
   };
 
   const handleRefresh = () => {
-    loadTeams();
+    setTeams([]);
+    setOffset(0);
+    setHasMore(true);
+    loadTeams(0, true);
   };
 
   return (
@@ -65,8 +89,9 @@ const TeamsList: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-text-col">Teams List</h2>
           <p className="text-text-col/60 text-sm mt-1">
-            {filteredTeams?.length || 0} team{filteredTeams?.length !== 1 ? "s" : ""}{" "}
+            {teams.length} team{teams.length !== 1 ? "s" : ""}{" "}
             {selectedSport !== "all" && `in ${selectedSport}`}
+            {hasMore && " (more available)"}
           </p>
         </div>
         <button
@@ -90,7 +115,8 @@ const TeamsList: React.FC = () => {
           id="sport-filter"
           value={selectedSport}
           onChange={(e) => setSelectedSport(e.target.value)}
-          className="w-full max-w-xs px-3 py-2 bg-bg-col text-text-col border border-component-col rounded-md focus:outline-none focus:ring-2 focus:ring-accent-col capitalize"
+          disabled={loading}
+          className="w-full max-w-xs px-3 py-2 bg-bg-col text-text-col border border-component-col rounded-md focus:outline-none focus:ring-2 focus:ring-accent-col capitalize disabled:opacity-50"
         >
           {sports.map((sport) => (
             <option key={sport} value={sport} className="capitalize">
@@ -112,7 +138,7 @@ const TeamsList: React.FC = () => {
         <div className="flex items-center justify-center py-12">
           <div className="w-8 h-8 border-4 border-accent-col border-t-transparent rounded-full animate-spin"></div>
         </div>
-      ) : !filteredTeams || filteredTeams.length === 0 ? (
+      ) : teams.length === 0 ? (
         <div className="text-center py-12">
           <p className="text-text-col/60">
             {selectedSport === "all"
@@ -121,15 +147,46 @@ const TeamsList: React.FC = () => {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredTeams.map((team) => (
-            <TeamCard
-              key={team.id}
-              team={team}
-              onClick={() => console.log("Team clicked:", team)}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {teams.map((team) => (
+              <TeamCard
+                key={team.id}
+                team={team}
+                onClick={() => console.log("Team clicked:", team)}
+              />
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {hasMore && (
+            <div className="flex justify-center mt-6">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-6 py-3 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-text-col border-t-transparent rounded-full animate-spin"></div>
+                    <span>Loading...</span>
+                  </>
+                ) : (
+                  <span>Load More Teams</span>
+                )}
+              </button>
+            </div>
+          )}
+
+          {/* End of Results Message */}
+          {!hasMore && teams.length > 0 && (
+            <div className="text-center mt-6">
+              <p className="text-text-col/60 text-sm">
+                You&apos;ve reached the end of the list
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
