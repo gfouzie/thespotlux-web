@@ -83,6 +83,11 @@ const baseApiRequest = async <T>(
       );
     }
 
+    // Handle 204 No Content responses
+    if (response.status === 204) {
+      return undefined as T;
+    }
+
     // Convert response from snake_case to camelCase
     const responseData = await response.json();
     return keysToCamel(responseData) as T;

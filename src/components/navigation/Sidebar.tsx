@@ -8,7 +8,6 @@ import Image from "next/image";
 import { useState } from "react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Settings, LogOut, ArrowLeft, ArrowRight } from "iconoir-react";
-import Icon from "@/components/common/Icon";
 import { navigationItems } from "@/constants/navigation";
 import { superuserNavigationItems } from "@/constants/superuserNavigation";
 
@@ -71,20 +70,23 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
   };
 
   // Reusable navigation item component
-  const NavItem = ({ item }: { item: (typeof navigationItems)[0] }) => (
-    <Link
-      href={item.href}
-      className={`flex items-center px-4 py-3 rounded-lg group ${
-        isActive(item.href)
-          ? "border-l-4 border-accent-col bg-bg-col/30"
-          : "hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
-      } ${!isCollapsed ? "space-x-3" : "justify-center"} text-text-col`}
-      title={isCollapsed ? item.name : undefined}
-    >
-      <Icon icon={item.icon} width={24} height={24} />
-      {!isCollapsed && <span className="font-medium">{item.name}</span>}
-    </Link>
-  );
+  const NavItem = ({ item }: { item: (typeof navigationItems)[0] }) => {
+    const IconComponent = item.icon;
+    return (
+      <Link
+        href={item.href}
+        className={`flex items-center px-4 py-3 rounded-lg group ${
+          isActive(item.href)
+            ? "border-l-4 border-accent-col bg-bg-col/30"
+            : "hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
+        } ${!isCollapsed ? "space-x-3" : "justify-center"} text-text-col`}
+        title={isCollapsed ? item.name : undefined}
+      >
+        <IconComponent width={24} height={24} />
+        {!isCollapsed && <span className="font-medium">{item.name}</span>}
+      </Link>
+    );
+  };
 
   if (!isAuthenticated) {
     return null;
@@ -103,11 +105,11 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <span className="text-text-col text-sm font-bold">
-          <Icon
-            icon={isCollapsed ? ArrowRight : ArrowLeft}
-            width={14}
-            height={14}
-          />
+          {isCollapsed ? (
+            <ArrowRight width={14} height={14} />
+          ) : (
+            <ArrowLeft width={14} height={14} />
+          )}
         </span>
       </button>
 
@@ -150,7 +152,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
           } text-text-col hover:bg-bg-col/50 hover:border-l-4 hover:border-red-500/50`}
           title={isCollapsed ? "Logout" : undefined}
         >
-          <Icon icon={LogOut} width={24} height={24} />
+          <LogOut width={24} height={24} />
           {!isCollapsed && <span className="font-medium">Logout</span>}
         </button>
       </div>

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import { promptsApi, type Prompt, type PromptCreate } from "@/api/prompts";
+import { promptCategoriesApi, type PromptCategory } from "@/api/promptCategories";
 import { sportsApi } from "@/api/sports";
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input";
@@ -20,6 +21,7 @@ export default function PromptsPage() {
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [sports, setSports] = useState<string[]>([]);
+  const [categories, setCategories] = useState<PromptCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -30,6 +32,7 @@ export default function PromptsPage() {
     name: "",
     sport: "",
     description: "",
+    promptCategoryId: undefined as number | undefined,
   });
 
   const loadPrompts = useCallback(async () => {
@@ -64,6 +67,15 @@ export default function PromptsPage() {
     }
   }, [formData.sport]);
 
+  const loadCategories = useCallback(async () => {
+    try {
+      const response = await promptCategoriesApi.getPromptCategories();
+      setCategories(response.data);
+    } catch (err) {
+      console.error("Failed to load categories:", err);
+    }
+  }, []);
+
   useEffect(() => {
     if (!userLoading && !isSuperuser) {
       router.push("/");
@@ -74,8 +86,9 @@ export default function PromptsPage() {
     if (isAuthenticated && isSuperuser) {
       loadPrompts();
       loadSports();
+      loadCategories();
     }
-  }, [isAuthenticated, isSuperuser, loadPrompts, loadSports]);
+  }, [isAuthenticated, isSuperuser, loadPrompts, loadSports, loadCategories]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,9 +100,10 @@ export default function PromptsPage() {
         name: formData.name,
         sport: formData.sport,
         description: formData.description || undefined,
+        promptCategoryId: formData.promptCategoryId,
       };
       await promptsApi.createPrompt(promptData);
-      setFormData({ name: "", sport: sports[0] || "", description: "" });
+      setFormData({ name: "", sport: sports[0] || "", description: "", promptCategoryId: undefined });
       setShowCreateForm(false);
       await loadPrompts();
     } catch (err) {
@@ -107,8 +121,9 @@ export default function PromptsPage() {
         name: formData.name,
         sport: formData.sport,
         description: formData.description || undefined,
+        promptCategoryId: formData.promptCategoryId,
       });
-      setFormData({ name: "", sport: sports[0] || "", description: "" });
+      setFormData({ name: "", sport: sports[0] || "", description: "", promptCategoryId: undefined });
       setEditingId(null);
       await loadPrompts();
     } catch (err) {
@@ -134,13 +149,14 @@ export default function PromptsPage() {
       name: prompt.name,
       sport: prompt.sport,
       description: prompt.description || "",
+      promptCategoryId: prompt.promptCategoryId,
     });
     setEditingId(prompt.id);
     setShowCreateForm(false);
   };
 
   const cancelEdit = () => {
-    setFormData({ name: "", sport: sports[0] || "", description: "" });
+    setFormData({ name: "", sport: sports[0] || "", description: "", promptCategoryId: undefined });
     setEditingId(null);
     setShowCreateForm(false);
   };
@@ -214,6 +230,26 @@ export default function PromptsPage() {
                 required
               />
 
+              <Select
+                label="Category (optional)"
+                value={formData.promptCategoryId?.toString() || ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    promptCategoryId: e.target.value ? parseInt(e.target.value) : undefined
+                  })
+                }
+                options={[
+                  { value: "", label: "None" },
+                  ...(categories.length === 0
+                    ? [{ value: "", label: "No categories available" }]
+                    : categories.map((category) => ({
+                        value: category.id.toString(),
+                        label: category.name,
+                      })))
+                ]}
+              />
+
               <Textarea
                 label="Description (optional)"
                 value={formData.description}
@@ -255,6 +291,9 @@ export default function PromptsPage() {
                     </h3>
                     <div className="text-sm text-text-col/60 mt-1">
                       Sport: {prompt.sport}
+                      {prompt.promptCategoryName && (
+                        <> • Category: {prompt.promptCategoryName}</>
+                      )}
                     </div>
                     {prompt.description && (
                       <p className="text-text-col/80 mt-2">

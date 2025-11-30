@@ -2,16 +2,21 @@
 
 import { useState, useRef } from "react";
 import Button from "@/components/common/Button";
-import { uploadApi, UploadType, UploadResponse } from "@/api/upload";
+import { uploadApi, UploadType } from "@/api/upload";
 import { ApiError } from "@/api/shared";
+
+interface UploadResult {
+  success: boolean;
+  fileUrl?: string;
+  error?: string;
+}
 
 const SimpleUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadResult, setUploadResult] = useState<
-    UploadResponse | { error: string } | null
-  >(null);
-  const [uploadType, setUploadType] = useState<UploadType>("prompt");
+  const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadType: UploadType = "profile_picture";
 
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -23,23 +28,25 @@ const SimpleUpload = () => {
     setUploadResult(null);
 
     try {
-      const result = await uploadApi.upload({
-        file,
-        type: uploadType,
-        metadata: {
-          title: file.name,
-          isPublic: true,
-        },
-      });
-
-      setUploadResult(result);
+      if (uploadType === "profile_picture") {
+        const result = await uploadApi.uploadProfilePicture(file);
+        setUploadResult({
+          success: true,
+          fileUrl: result.profileImageUrl,
+        });
+      } else {
+        setUploadResult({
+          success: false,
+          error: "This upload type requires additional parameters (reel ID, highlight ID, etc.)",
+        });
+      }
     } catch (error) {
       console.error("Upload error:", error);
 
       if (error instanceof ApiError) {
-        setUploadResult({ error: error.message });
+        setUploadResult({ success: false, error: error.message });
       } else {
-        setUploadResult({ error: "Upload failed" });
+        setUploadResult({ success: false, error: "Upload failed" });
       }
     } finally {
       setIsUploading(false);
@@ -56,34 +63,13 @@ const SimpleUpload = () => {
       </h3>
 
       <div className="space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-text-col">
-            Upload Type
-          </label>
-          <div className="flex space-x-2">
-            <button
-              type="button"
-              onClick={() => setUploadType("prompt")}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                uploadType === "prompt"
-                  ? "bg-accent-col text-white"
-                  : "bg-bg-col/30 text-text-col hover:bg-bg-col/50"
-              }`}
-            >
-              Prompt
-            </button>
-            <button
-              type="button"
-              onClick={() => setUploadType("challenge")}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                uploadType === "challenge"
-                  ? "bg-accent-col text-white"
-                  : "bg-bg-col/30 text-text-col hover:bg-bg-col/50"
-              }`}
-            >
-              Challenge
-            </button>
-          </div>
+        <div className="bg-bg-col/30 p-3 rounded">
+          <p className="text-sm text-text-col">
+            <strong>Upload Type:</strong> Profile Picture
+          </p>
+          <p className="text-xs text-text-col/60 mt-1">
+            This demo only supports profile picture uploads. Other upload types require additional context (reel IDs, etc.)
+          </p>
         </div>
 
         <input
@@ -105,31 +91,29 @@ const SimpleUpload = () => {
 
         {uploadResult && (
           <div className="mt-4 p-4 bg-bg-col/30 rounded-lg">
-            {"error" in uploadResult ? (
+            {!uploadResult.success ? (
               <p className="text-red-400">Error: {uploadResult.error}</p>
             ) : (
               <div className="space-y-2">
                 <p className="text-green-400">✅ Upload successful!</p>
                 <p className="text-sm text-text-col/70">
-                  <strong>File:</strong> {uploadResult.filename}
+                  <strong>Type:</strong> {uploadType}
                 </p>
-                <p className="text-sm text-text-col/70">
-                  <strong>Type:</strong> {uploadResult.upload_type}
-                </p>
-                <p className="text-sm text-text-col/70">
-                  <strong>Bucket:</strong> {uploadResult.bucket_name}
-                </p>
-                <p className="text-sm text-text-col/70">
-                  <strong>S3 Key:</strong> {uploadResult.s3_key}
-                </p>
-                <a
-                  href={uploadResult.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-col hover:underline text-sm"
-                >
-                  View File →
-                </a>
+                {uploadResult.fileUrl && (
+                  <>
+                    <p className="text-sm text-text-col/70 break-all">
+                      <strong>URL:</strong> {uploadResult.fileUrl}
+                    </p>
+                    <a
+                      href={uploadResult.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-accent-col hover:underline text-sm inline-block"
+                    >
+                      View File →
+                    </a>
+                  </>
+                )}
               </div>
             )}
           </div>

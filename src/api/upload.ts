@@ -2,19 +2,61 @@ import { config } from "@/lib/config";
 import { authRequest } from "./shared";
 
 /**
- * Upload types for different file categories
+ * Base interface for presigned URL requests
  */
-export type UploadType = "prompt" | "challenge" | "profile_picture" | "team_picture";
-
-/**
- * Presigned URL request interface
- */
-export interface PresignedUrlRequest {
+interface BasePresignedUrlRequest {
   filename: string;
   contentType: string;
-  uploadType: UploadType;
-  teamId?: number;
 }
+
+/**
+ * Profile picture upload request
+ */
+interface ProfilePicturePresignedUrlRequest extends BasePresignedUrlRequest {
+  uploadType: "profile_picture";
+}
+
+/**
+ * Team picture upload request
+ */
+interface TeamPicturePresignedUrlRequest extends BasePresignedUrlRequest {
+  uploadType: "team_picture";
+  teamId: number;
+}
+
+/**
+ * Highlight video upload request
+ */
+interface HighlightVideoPresignedUrlRequest extends BasePresignedUrlRequest {
+  uploadType: "highlight_video";
+  highlightReelId: number;
+}
+
+/**
+ * Highlight reel thumbnail upload request
+ */
+interface HighlightReelThumbnailPresignedUrlRequest extends BasePresignedUrlRequest {
+  uploadType: "highlight_reel_thumbnail";
+  highlightReelId: number;
+}
+
+/**
+ * Highlight thumbnail upload request
+ */
+interface HighlightThumbnailPresignedUrlRequest extends BasePresignedUrlRequest {
+  uploadType: "highlight_thumbnail";
+  highlightId: number;
+}
+
+/**
+ * Discriminated union of all presigned URL request types
+ */
+export type PresignedUrlRequest =
+  | ProfilePicturePresignedUrlRequest
+  | TeamPicturePresignedUrlRequest
+  | HighlightVideoPresignedUrlRequest
+  | HighlightReelThumbnailPresignedUrlRequest
+  | HighlightThumbnailPresignedUrlRequest;
 
 /**
  * Presigned URL response interface
@@ -27,13 +69,60 @@ export interface PresignedUrlResponse {
 }
 
 /**
- * Upload completion request interface
+ * Base interface for upload completion requests
  */
-export interface UploadCompleteRequest {
+interface BaseUploadCompleteRequest {
   s3Key: string;
-  uploadType: UploadType;
-  teamId?: number;
 }
+
+/**
+ * Profile picture upload completion request
+ */
+interface ProfilePictureUploadCompleteRequest extends BaseUploadCompleteRequest {
+  uploadType: "profile_picture";
+}
+
+/**
+ * Team picture upload completion request
+ */
+interface TeamPictureUploadCompleteRequest extends BaseUploadCompleteRequest {
+  uploadType: "team_picture";
+  teamId: number;
+}
+
+/**
+ * Highlight video upload completion request
+ */
+interface HighlightVideoUploadCompleteRequest extends BaseUploadCompleteRequest {
+  uploadType: "highlight_video";
+  highlightReelId: number;
+}
+
+/**
+ * Highlight reel thumbnail upload completion request
+ */
+interface HighlightReelThumbnailUploadCompleteRequest extends BaseUploadCompleteRequest {
+  uploadType: "highlight_reel_thumbnail";
+  highlightReelId: number;
+}
+
+/**
+ * Highlight thumbnail upload completion request
+ */
+interface HighlightThumbnailUploadCompleteRequest extends BaseUploadCompleteRequest {
+  uploadType: "highlight_thumbnail";
+  highlightId: number;
+}
+
+/**
+ * Discriminated union of all upload completion request types
+ */
+export type UploadCompleteRequest =
+  | ProfilePictureUploadCompleteRequest
+  | TeamPictureUploadCompleteRequest
+  | HighlightVideoUploadCompleteRequest
+  | HighlightReelThumbnailUploadCompleteRequest
+  | HighlightThumbnailUploadCompleteRequest;
 
 /**
  * Profile picture upload response interface
@@ -178,5 +267,104 @@ export const uploadApi = {
         method: "DELETE",
       }
     );
+  },
+
+  /**
+   * Upload highlight video using presigned URL flow
+   */
+  uploadHighlightVideo: async (
+    reelId: number,
+    file: File
+  ): Promise<{ fileUrl: string; s3Key: string }> => {
+    // Step 1: Request presigned URL from backend
+    const presignedRequest: PresignedUrlRequest = {
+      filename: file.name,
+      contentType: file.type,
+      uploadType: "highlight_video",
+      highlightReelId: reelId,
+    };
+
+    const presignedData = await authRequest<PresignedUrlResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/presigned-url`,
+      {
+        method: "POST",
+        body: JSON.stringify(presignedRequest),
+      }
+    );
+
+    // Step 2: Upload directly to S3
+    await uploadToS3(file, presignedData);
+
+    // Return the file URL and S3 key for use in creating the highlight
+    return {
+      fileUrl: presignedData.fileUrl,
+      s3Key: presignedData.s3Key,
+    };
+  },
+
+  /**
+   * Upload highlight reel thumbnail using presigned URL flow
+   */
+  uploadHighlightReelThumbnail: async (
+    reelId: number,
+    file: File
+  ): Promise<{ fileUrl: string; s3Key: string }> => {
+    // Step 1: Request presigned URL from backend
+    const presignedRequest: PresignedUrlRequest = {
+      filename: file.name,
+      contentType: file.type,
+      uploadType: "highlight_reel_thumbnail",
+      highlightReelId: reelId,
+    };
+
+    const presignedData = await authRequest<PresignedUrlResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/presigned-url`,
+      {
+        method: "POST",
+        body: JSON.stringify(presignedRequest),
+      }
+    );
+
+    // Step 2: Upload directly to S3
+    await uploadToS3(file, presignedData);
+
+    // Return the file URL and S3 key
+    return {
+      fileUrl: presignedData.fileUrl,
+      s3Key: presignedData.s3Key,
+    };
+  },
+
+  /**
+   * Upload highlight thumbnail using presigned URL flow
+   */
+  uploadHighlightThumbnail: async (
+    highlightId: number,
+    file: File
+  ): Promise<{ fileUrl: string; s3Key: string }> => {
+    // Step 1: Request presigned URL from backend
+    const presignedRequest: PresignedUrlRequest = {
+      filename: file.name,
+      contentType: file.type,
+      uploadType: "highlight_thumbnail",
+      highlightId: highlightId,
+    };
+
+    const presignedData = await authRequest<PresignedUrlResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/presigned-url`,
+      {
+        method: "POST",
+        body: JSON.stringify(presignedRequest),
+      }
+    );
+
+    // Step 2: Upload directly to S3
+    await uploadToS3(file, presignedData);
+
+    // Return the file URL and S3 key
+    return {
+      fileUrl: presignedData.fileUrl,
+      s3Key: presignedData.s3Key,
+    };
   },
 };

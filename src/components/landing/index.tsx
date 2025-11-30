@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Button from "@/components/common/Button";
-import Icon from "@/components/common/Icon";
 import { Play, Search, Star } from "iconoir-react";
 
 export default function LandingPage() {
@@ -41,8 +40,7 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Icon
-                  icon={Play}
+                <Play
                   width={24}
                   height={24}
                   className="text-accent-col"
@@ -59,8 +57,7 @@ export default function LandingPage() {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Icon
-                  icon={Search}
+                <Search
                   width={24}
                   height={24}
                   className="text-accent-col"
@@ -75,8 +72,7 @@ export default function LandingPage() {
 
             <div className="text-center">
               <div className="w-12 h-12 bg-accent-col/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Icon
-                  icon={Star}
+                <Star
                   width={24}
                   height={24}
                   className="text-accent-col"

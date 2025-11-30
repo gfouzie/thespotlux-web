@@ -8,18 +8,28 @@ export interface Prompt {
   description?: string;
   createdByUserId: number;
   createdAt: string;
+  promptCategoryId?: number;
+  promptCategoryName?: string;
+  featuredStartDate?: string;
+  featuredEndDate?: string;
 }
 
 export interface PromptCreate {
   name: string;
   sport: string;
   description?: string;
+  promptCategoryId?: number;
+  featuredStartDate?: string;
+  featuredEndDate?: string;
 }
 
 export interface PromptUpdate {
   name?: string;
   sport?: string;
   description?: string;
+  promptCategoryId?: number;
+  featuredStartDate?: string;
+  featuredEndDate?: string;
 }
 
 export interface PaginatedPromptsResponse {

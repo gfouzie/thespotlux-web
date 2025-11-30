@@ -1,0 +1,375 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Modal from "@/components/common/Modal";
+import Select from "@/components/common/Select";
+import Button from "@/components/common/Button";
+import Alert from "@/components/common/Alert";
+import { Xmark, Upload, VideoCamera, Menu } from "iconoir-react";
+import { HighlightReel, highlightReelsApi } from "@/api/highlightReels";
+import { Highlight, highlightsApi } from "@/api/highlights";
+import { uploadApi } from "@/api/upload";
+import { cn } from "@/lib/utils";
+
+interface EditReelModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+  reel: HighlightReel;
+}
+
+export default function EditReelModal({
+  isOpen,
+  onClose,
+  onSuccess,
+  reel,
+}: EditReelModalProps) {
+  const [highlights, setHighlights] = useState<Highlight[]>([]);
+  const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [visibility, setVisibility] = useState<"private" | "public" | "friends_only">("private");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [reorderedClips, setReorderedClips] = useState<Set<number>>(new Set());
+
+  // Load highlights for this reel
+  const loadHighlights = async () => {
+    setIsLoadingHighlights(true);
+    try {
+      const response = await highlightsApi.getHighlightsByReel(reel.id);
+      const sorted = response.data.sort((a, b) => a.orderIndex - b.orderIndex);
+      setHighlights(sorted);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load highlights");
+    } finally {
+      setIsLoadingHighlights(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadHighlights();
+      setThumbnailPreview(reel.thumbnailUrl || null);
+      setVisibility(reel.visibility);
+    }
+  }, [isOpen, reel.id]);
+
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024;
+    if (file.size > maxSize) {
+      setError("Image must be less than 5MB");
+      return;
+    }
+
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+    setError(null);
+  };
+
+  const handleRemoveThumbnail = () => {
+    if (thumbnailPreview && thumbnailPreview.startsWith("blob:")) {
+      URL.revokeObjectURL(thumbnailPreview);
+    }
+    setThumbnailFile(null);
+    setThumbnailPreview(reel.thumbnailUrl || null);
+  };
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
+    }
+
+    const newHighlights = [...highlights];
+    const [draggedItem] = newHighlights.splice(draggedIndex, 1);
+    newHighlights.splice(dropIndex, 0, draggedItem);
+
+    setHighlights(newHighlights);
+
+    // Mark affected clips as reordered
+    const affected = new Set(reorderedClips);
+    for (let i = Math.min(draggedIndex, dropIndex); i <= Math.max(draggedIndex, dropIndex); i++) {
+      affected.add(newHighlights[i].id);
+    }
+    setReorderedClips(affected);
+
+    setDraggedIndex(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      // Update clip order if any clips were reordered
+      if (reorderedClips.size > 0) {
+        await highlightsApi.bulkReorderHighlights({
+          highlightReelId: reel.id,
+          reorders: highlights.map((highlight, index) => ({
+            highlightId: highlight.id,
+            orderIndex: index + 1,
+          })),
+        });
+      }
+
+      let thumbnailUrl = reel.thumbnailUrl;
+
+      // Upload thumbnail if a new one was selected
+      if (thumbnailFile) {
+        const { fileUrl } = await uploadApi.uploadHighlightReelThumbnail(
+          reel.id,
+          thumbnailFile
+        );
+        thumbnailUrl = fileUrl;
+      } else if (!thumbnailPreview && highlights.length > 0) {
+        // If no thumbnail and we have highlights, use the first video as thumbnail
+        // For now, we'll use the video URL directly - ideally we'd extract a frame
+        thumbnailUrl = highlights[0].videoUrl;
+      }
+
+      // Update the reel with the new thumbnail and/or visibility
+      if (thumbnailUrl !== reel.thumbnailUrl || visibility !== reel.visibility) {
+        await highlightReelsApi.updateHighlightReel(reel.id, {
+          thumbnailUrl: thumbnailUrl !== reel.thumbnailUrl ? thumbnailUrl : undefined,
+          visibility: visibility !== reel.visibility ? visibility : undefined,
+        });
+      }
+
+      onSuccess();
+      handleClose();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update reel");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleClose = () => {
+    if (thumbnailPreview && thumbnailPreview.startsWith("blob:")) {
+      URL.revokeObjectURL(thumbnailPreview);
+    }
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    setVisibility(reel.visibility);
+    setError(null);
+    setReorderedClips(new Set());
+    setDraggedIndex(null);
+    onClose();
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title="Edit Highlight Reel"
+      size="lg"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {error && (
+          <Alert variant="error" onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
+
+        {/* Reel Info */}
+        <div className="bg-bg-col/30 p-3 rounded">
+          <p className="text-sm text-text-col/60">
+            <strong>Reel:</strong> {reel.name}
+          </p>
+          <p className="text-sm text-text-col/60">
+            <strong>Sport:</strong> {reel.sport.charAt(0).toUpperCase() + reel.sport.slice(1)}
+          </p>
+        </div>
+
+        {/* Visibility Setting */}
+        <Select
+          label="Visibility"
+          value={visibility}
+          onChange={(e) =>
+            setVisibility(e.target.value as "private" | "public" | "friends_only")
+          }
+          options={[
+            { value: "private", label: "Private - Only you can see" },
+            { value: "friends_only", label: "Friends Only - Only friends can see" },
+            { value: "public", label: "Public - Everyone can see" },
+          ]}
+          required
+        />
+
+        {/* Thumbnail Upload Section */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-text-col">
+            Reel Thumbnail
+          </label>
+          <p className="text-xs text-text-col/60 mb-2">
+            Upload a custom thumbnail or leave blank to use the first video
+          </p>
+
+          {thumbnailPreview ? (
+            <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-bg-col">
+              {thumbnailPreview.endsWith(".mp4") ||
+              thumbnailPreview.endsWith(".mov") ||
+              thumbnailPreview.endsWith(".webm") ? (
+                <video
+                  src={thumbnailPreview}
+                  className="w-full h-full object-cover"
+                  preload="metadata"
+                />
+              ) : (
+                <img
+                  src={thumbnailPreview}
+                  alt="Thumbnail preview"
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <button
+                type="button"
+                onClick={handleRemoveThumbnail}
+                className="absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white p-1 rounded"
+              >
+                <Xmark className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="border-2 border-dashed border-text-col/30 rounded-lg p-6 text-center">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailSelect}
+                className="hidden"
+                id="thumbnail-upload"
+                disabled={isSubmitting}
+              />
+              <label
+                htmlFor="thumbnail-upload"
+                className={cn(
+                  "cursor-pointer flex flex-col items-center gap-2",
+                  isSubmitting && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                <Upload className="w-8 h-8 text-text-col/40" />
+                <p className="text-sm text-text-col/80">Click to upload thumbnail</p>
+                <p className="text-xs text-text-col/60">
+                  JPG, PNG, WEBP up to 5MB
+                </p>
+              </label>
+            </div>
+          )}
+        </div>
+
+        {/* Clip Reordering Section */}
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-text-col">
+            Reorder Clips ({highlights.length})
+          </label>
+          {highlights.length > 0 && (
+            <p className="text-xs text-text-col/60">
+              Drag and drop clips to reorder them
+            </p>
+          )}
+
+          {isLoadingHighlights ? (
+            <div className="text-center py-8">
+              <p className="text-sm text-text-col/60">Loading clips...</p>
+            </div>
+          ) : highlights.length === 0 ? (
+            <div className="text-center py-8 bg-bg-col/30 rounded-lg border border-bg-col">
+              <VideoCamera className="w-12 h-12 text-text-col/20 mx-auto mb-2" />
+              <p className="text-sm text-text-col/60">No clips in this reel yet</p>
+            </div>
+          ) : (
+            <div className="space-y-2 max-h-80 overflow-y-auto">
+              {highlights.map((highlight, index) => (
+                <div
+                  key={highlight.id}
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={(e) => handleDrop(e, index)}
+                  onDragEnd={handleDragEnd}
+                  className={cn(
+                    "flex items-center gap-3 p-3 rounded border transition-all cursor-move",
+                    draggedIndex === index
+                      ? "opacity-50 bg-bg-col/50 border-accent-col"
+                      : "bg-bg-col/30 border-bg-col hover:border-accent-col/50"
+                  )}
+                >
+                  {/* Drag Handle */}
+                  <Menu className="w-5 h-5 text-text-col/40 flex-shrink-0" />
+
+                  {/* Video Preview */}
+                  <video
+                    src={highlight.videoUrl}
+                    className="w-16 h-24 object-cover rounded"
+                    preload="metadata"
+                  />
+
+                  {/* Clip Info */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-text-col font-medium">
+                      Clip #{index + 1}
+                    </p>
+                    {highlight.promptName && (
+                      <p className="text-xs text-text-col/60 truncate">
+                        {highlight.promptName}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Reordered indicator */}
+                  {reorderedClips.has(highlight.id) && (
+                    <div className="text-xs text-accent-col font-medium">
+                      Modified
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-2 pt-4">
+          <Button type="submit" isLoading={isSubmitting} className="flex-1">
+            Save Changes
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+}

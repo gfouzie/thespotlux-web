@@ -1,14 +1,16 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { Xmark } from "iconoir-react";
 
 interface AlertProps {
   variant?: "error" | "success" | "warning" | "info";
   children: React.ReactNode;
   className?: string;
+  onClose?: () => void;
 }
 
-const Alert = ({ variant = "info", children, className }: AlertProps) => {
+const Alert = ({ variant = "info", children, className, onClose }: AlertProps) => {
   const variantStyles = {
     error: "bg-red-500/10 border-red-500 text-red-500",
     success: "bg-green-500/10 border-green-500 text-green-500",
@@ -19,12 +21,21 @@ const Alert = ({ variant = "info", children, className }: AlertProps) => {
   return (
     <div
       className={cn(
-        "p-4 rounded border",
+        "p-4 rounded border relative",
         variantStyles[variant],
         className
       )}
     >
       {children}
+      {onClose && (
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 p-1 rounded hover:bg-black/10 transition-colors"
+          aria-label="Close alert"
+        >
+          <Xmark className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 };
