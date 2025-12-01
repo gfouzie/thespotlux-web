@@ -59,8 +59,9 @@ export default function SearchInput({
       />
       {value && (
         <button
+          type="button"
           onClick={handleClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-text-col/60 hover:text-text-col"
+          className="absolute cursor-pointer right-3 top-1/2 -translate-y-1/2 text-text-col/60 hover:text-text-col"
           aria-label="Clear search"
         >
           <Xmark className="w-5 h-5" />

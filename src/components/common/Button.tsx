@@ -84,6 +84,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <button
         ref={ref}
+        type="button"
         disabled={isDisabled}
         className={cn(
           baseStyles,

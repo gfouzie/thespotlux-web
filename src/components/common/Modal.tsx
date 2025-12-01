@@ -99,8 +99,9 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(
               )}
               {showCloseButton && (
                 <button
+                  type="button"
                   onClick={onClose}
-                  className="ml-auto p-2 rounded-lg text-text-col/60 hover:text-text-col hover:bg-bg-col/50 transition-colors"
+                  className="cursor-pointer ml-auto p-2 rounded-lg text-text-col/60 hover:text-text-col hover:bg-bg-col/50 transition-colors"
                   aria-label="Close modal"
                 >
                   <Xmark className="w-5 h-5" />

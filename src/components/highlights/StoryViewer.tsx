@@ -177,8 +177,9 @@ export default function StoryViewer({
         <div className="flex items-center gap-2">
           {/* Mute/Unmute Button */}
           <button
+            type="button"
             onClick={toggleMute}
-            className="p-2 rounded-full hover:bg-white/20 transition-colors"
+            className="cursor-pointer p-2 rounded-full hover:bg-white/20 transition-colors"
             aria-label={isMuted ? "Unmute" : "Mute"}
           >
             {isMuted ? <SoundOff className="w-5 h-5 text-white" /> : <SoundHigh className="w-5 h-5 text-white" />}
@@ -186,8 +187,9 @@ export default function StoryViewer({
 
           {/* Close Button */}
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-white/20 transition-colors"
+            className="cursor-pointer p-2 rounded-full hover:bg-white/20 transition-colors"
             aria-label="Close"
           >
             <Xmark className="w-5 h-5 text-white" />
@@ -210,8 +212,9 @@ export default function StoryViewer({
       {/* Navigation Arrows */}
       {!isFirst && (
         <button
+          type="button"
           onClick={goToPrevious}
-          className="absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+          className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
           aria-label="Previous clip"
         >
           <NavArrowLeft className="w-6 h-6 text-white" />
@@ -220,8 +223,9 @@ export default function StoryViewer({
 
       {!isLast && (
         <button
+          type="button"
           onClick={goToNext}
-          className="absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
+          className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-colors"
           aria-label="Next clip"
         >
           <NavArrowRight className="w-6 h-6 text-white" />

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import Button from "@/components/common/Button";
-import { uploadApi, UploadType } from "@/api/upload";
+import { uploadApi } from "@/api/upload";
 import { ApiError } from "@/api/shared";
 
 interface UploadResult {
@@ -16,8 +16,6 @@ const SimpleUpload = () => {
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const uploadType: UploadType = "profile_picture";
-
   const handleFileSelect = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -28,18 +26,11 @@ const SimpleUpload = () => {
     setUploadResult(null);
 
     try {
-      if (uploadType === "profile_picture") {
-        const result = await uploadApi.uploadProfilePicture(file);
-        setUploadResult({
-          success: true,
-          fileUrl: result.profileImageUrl,
-        });
-      } else {
-        setUploadResult({
-          success: false,
-          error: "This upload type requires additional parameters (reel ID, highlight ID, etc.)",
-        });
-      }
+      const result = await uploadApi.uploadProfilePicture(file);
+      setUploadResult({
+        success: true,
+        fileUrl: result.profileImageUrl,
+      });
     } catch (error) {
       console.error("Upload error:", error);
 
@@ -97,7 +88,7 @@ const SimpleUpload = () => {
               <div className="space-y-2">
                 <p className="text-green-400">✅ Upload successful!</p>
                 <p className="text-sm text-text-col/70">
-                  <strong>Type:</strong> {uploadType}
+                  <strong>Type:</strong> profile_picture
                 </p>
                 {uploadResult.fileUrl && (
                   <>

@@ -322,8 +322,9 @@ export default function HighlightUploadModal({
                 {/* Remove Button */}
                 {fileWithPreview.uploadStatus === "pending" && !isUploading && (
                   <button
+                    type="button"
                     onClick={() => removeFile(index)}
-                    className="p-2 hover:bg-bg-col/50 rounded transition-colors"
+                    className="cursor-pointer p-2 hover:bg-bg-col/50 rounded transition-colors"
                   >
                     <Xmark className="w-4 h-4 text-text-col/60" />
                   </button>

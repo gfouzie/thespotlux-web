@@ -151,8 +151,9 @@ export default function SportTabContent({
               {selectedReel.name}
             </h3>
             <button
+              type="button"
               onClick={() => setShowClipManager(false)}
-              className="text-text-col/60 hover:text-text-col"
+              className="text-text-col/60 hover:text-text-col cursor-pointer"
             >
               Close
             </button>

@@ -28,6 +28,7 @@ export default function EditReelModal({
   const [isLoadingHighlights, setIsLoadingHighlights] = useState(true);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [shouldRemoveThumbnail, setShouldRemoveThumbnail] = useState(false);
   const [visibility, setVisibility] = useState<"private" | "public" | "friends_only">("private");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,12 +54,16 @@ export default function EditReelModal({
       loadHighlights();
       setThumbnailPreview(reel.thumbnailUrl || null);
       setVisibility(reel.visibility);
+      setShouldRemoveThumbnail(false);
     }
   }, [isOpen, reel.id]);
 
   const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Reset remove flag when selecting a new thumbnail
+    setShouldRemoveThumbnail(false);
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
@@ -83,14 +88,15 @@ export default function EditReelModal({
       URL.revokeObjectURL(thumbnailPreview);
     }
     setThumbnailFile(null);
-    setThumbnailPreview(reel.thumbnailUrl || null);
+    setThumbnailPreview(null);
+    setShouldRemoveThumbnail(true);
   };
 
   const handleDragStart = (index: number) => {
     setDraggedIndex(index);
   };
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: React.DragEvent, _index: number) => {
     e.preventDefault();
   };
 
@@ -139,27 +145,37 @@ export default function EditReelModal({
         });
       }
 
-      let thumbnailUrl = reel.thumbnailUrl;
+      let thumbnailUrl: string | null = reel.thumbnailUrl || null;
+      let shouldUpdateThumbnail = false;
 
-      // Upload thumbnail if a new one was selected
-      if (thumbnailFile) {
+      // Handle thumbnail removal
+      if (shouldRemoveThumbnail) {
+        thumbnailUrl = null;
+        shouldUpdateThumbnail = true;
+      }
+      // Upload new thumbnail if one was selected
+      else if (thumbnailFile) {
         const { fileUrl } = await uploadApi.uploadHighlightReelThumbnail(
           reel.id,
           thumbnailFile
         );
         thumbnailUrl = fileUrl;
-      } else if (!thumbnailPreview && highlights.length > 0) {
-        // If no thumbnail and we have highlights, use the first video as thumbnail
-        // For now, we'll use the video URL directly - ideally we'd extract a frame
-        thumbnailUrl = highlights[0].videoUrl;
+        shouldUpdateThumbnail = true;
       }
 
       // Update the reel with the new thumbnail and/or visibility
-      if (thumbnailUrl !== reel.thumbnailUrl || visibility !== reel.visibility) {
-        await highlightReelsApi.updateHighlightReel(reel.id, {
-          thumbnailUrl: thumbnailUrl !== reel.thumbnailUrl ? thumbnailUrl : undefined,
-          visibility: visibility !== reel.visibility ? visibility : undefined,
-        });
+      const updateData: { thumbnailUrl?: string | null; visibility?: "private" | "public" | "friends_only" } = {};
+
+      if (shouldUpdateThumbnail && thumbnailUrl !== reel.thumbnailUrl) {
+        updateData.thumbnailUrl = thumbnailUrl;
+      }
+
+      if (visibility !== reel.visibility) {
+        updateData.visibility = visibility;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        await highlightReelsApi.updateHighlightReel(reel.id, updateData);
       }
 
       onSuccess();
@@ -177,6 +193,7 @@ export default function EditReelModal({
     }
     setThumbnailFile(null);
     setThumbnailPreview(null);
+    setShouldRemoveThumbnail(false);
     setVisibility(reel.visibility);
     setError(null);
     setReorderedClips(new Set());
@@ -252,7 +269,7 @@ export default function EditReelModal({
               <button
                 type="button"
                 onClick={handleRemoveThumbnail}
-                className="absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white p-1 rounded"
+                className="cursor-pointer absolute top-1 right-1 bg-black/60 hover:bg-black/80 text-white p-1 rounded"
               >
                 <Xmark className="w-4 h-4" />
               </button>

@@ -95,9 +95,10 @@ const TeamsList: React.FC = () => {
           </p>
         </div>
         <button
+          type="button"
           onClick={handleRefresh}
           disabled={loading}
-          className="px-4 py-2 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Loading..." : "Refresh"}
         </button>
@@ -162,9 +163,10 @@ const TeamsList: React.FC = () => {
           {hasMore && (
             <div className="flex justify-center mt-6">
               <button
+                type="button"
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-6 py-3 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+                className="px-6 py-3 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
               >
                 {loadingMore ? (
                   <>

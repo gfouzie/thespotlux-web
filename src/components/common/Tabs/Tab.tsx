@@ -16,7 +16,7 @@ const Tab = forwardRef<HTMLButtonElement, TabProps>(
         role="tab"
         aria-selected={isActive}
         className={cn(
-          "inline-flex items-center justify-center px-4 py-3 text-sm font-medium transition-colors duration-200",
+          "inline-flex cursor-pointer items-center justify-center px-4 py-3 text-sm font-medium transition-colors duration-200",
           "border-b-2 focus:outline-none focus:ring-2 focus:ring-accent-col/50",
           isActive
             ? "border-accent-col text-text-col"

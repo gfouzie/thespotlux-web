@@ -30,7 +30,7 @@ const Alert = ({ variant = "info", children, className, onClose }: AlertProps) =
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 p-1 rounded hover:bg-black/10 transition-colors"
+          className="cursor-pointer absolute top-2 right-2 p-1 rounded hover:bg-black/10 transition-colors"
           aria-label="Close alert"
         >
           <Xmark className="w-4 h-4" />

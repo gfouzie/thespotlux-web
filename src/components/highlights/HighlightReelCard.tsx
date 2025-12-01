@@ -30,7 +30,7 @@ export default function HighlightReelCard({
       {/* Thumbnail Circle */}
       <div className="relative">
         {/* Gradient Border Ring (like Instagram stories) */}
-        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-accent-col via-accent-col/70 to-accent-col/40 p-0.5">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-accent-col via-accent-col/70 to-accent-col/40 p-0.5 relative z-0">
           <div className="w-full h-full rounded-full bg-bg-col p-0.5">
             {reel.thumbnailUrl ? (
               reel.thumbnailUrl.match(/\.(mp4|mov|webm)$/i) ? (
@@ -77,11 +77,12 @@ export default function HighlightReelCard({
         {/* Edit Button (owner only, shows on hover) */}
         {isOwner && onEdit && (
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onEdit(e);
             }}
-            className="absolute -top-1 -right-1 w-6 h-6 bg-black/80 hover:bg-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg border border-white/20"
+            className="absolute -top-1 -right-1 w-6 h-6 bg-black/80 hover:bg-black rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg border border-white/20 cursor-pointer z-10"
             title="Edit reel"
           >
             <Settings className="w-3.5 h-3.5 text-white" />

@@ -139,8 +139,9 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
           {isEditMode && !uploading && (
             <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button
+                type="button"
                 onClick={handleUploadClick}
-                className="p-3 bg-accent-col rounded-full hover:opacity-80 transition-opacity"
+                className="cursor-pointer p-3 bg-accent-col rounded-full hover:opacity-80 transition-opacity"
                 aria-label="Upload new picture"
               >
                 <Camera className="w-6 h-6 text-text-col" />
@@ -160,9 +161,10 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
         {isEditMode && (
           <div className="flex items-center space-x-3">
               <button
+                type="button"
                 onClick={handleUploadClick}
                 disabled={uploading}
-                className="flex items-center space-x-2 px-4 py-2 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer flex items-center space-x-2 px-4 py-2 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <UploadSquare className="w-4 h-4" />
                 <span>Upload New</span>
@@ -170,9 +172,10 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
 
             {profileImageUrl && (
               <button
+                type="button"
                 onClick={() => setShowDeleteConfirm(true)}
                 disabled={uploading}
-                className="flex items-center space-x-2 px-4 py-2 bg-component-col text-text-col rounded-md hover:bg-red-500/20 hover:border-red-500 border border-component-col transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer flex items-center space-x-2 px-4 py-2 bg-component-col text-text-col rounded-md hover:bg-red-500/20 hover:border-red-500 border border-component-col transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Trash className="w-4 h-4" />
                 <span>Remove</span>
@@ -219,8 +222,9 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
                 Delete Profile Picture
               </h3>
               <button
+                type="button"
                 onClick={() => setShowDeleteConfirm(false)}
-                className="text-text-col opacity-70 hover:opacity-100"
+                className="cursor-pointer text-text-col opacity-70 hover:opacity-100"
               >
                 <Xmark className="w-5 h-5" />
               </button>
@@ -233,16 +237,18 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
 
             <div className="flex items-center space-x-3">
               <button
+                type="button"
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={uploading}
-                className="flex-1 px-4 py-2 bg-component-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50"
+                className="cursor-pointer flex-1 px-4 py-2 bg-component-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
+                type="button"
                 onClick={handleDelete}
                 disabled={uploading}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
+                className="cursor-pointer flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
               >
                 {uploading ? "Deleting..." : "Delete"}
               </button>

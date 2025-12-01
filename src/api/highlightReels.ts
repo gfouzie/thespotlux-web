@@ -36,7 +36,7 @@ export interface HighlightReelUpdateRequest {
   sport?: string;
   orderRanking?: number;
   visibility?: "private" | "public" | "friends_only";
-  thumbnailUrl?: string;
+  thumbnailUrl?: string | null;
 }
 
 /**

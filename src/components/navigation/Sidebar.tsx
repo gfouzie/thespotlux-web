@@ -70,7 +70,13 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
   };
 
   // Reusable navigation item component
-  const NavItem = ({ item }: { item: (typeof navigationItems)[0] }) => {
+  type NavItemType = {
+    name: string;
+    href: string;
+    icon: React.ComponentType<{ width?: number; height?: number }>;
+  };
+
+  const NavItem = ({ item }: { item: NavItemType }) => {
     const IconComponent = item.icon;
     return (
       <Link
@@ -100,8 +106,9 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
     >
       {/* Floating Toggle Button */}
       <button
+        type="button"
         onClick={handleToggleCollapse}
-        className="absolute -right-3 top-19 z-10 w-6 h-6 bg-bg-col border border-text-col/20 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hover:bg-accent-col hover:text-white cursor-pointer"
+        className="cursor-pointer absolute -right-3 top-19 z-10 w-6 h-6 bg-bg-col border border-text-col/20 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center hover:bg-accent-col hover:text-white cursor-pointer"
         title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
       >
         <span className="text-text-col text-sm font-bold">
@@ -146,6 +153,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
         />
 
         <button
+          type="button"
           onClick={handleLogout}
           className={`w-full flex items-center px-4 py-3 rounded-lg group cursor-pointer ${
             !isCollapsed ? "space-x-3" : "justify-center"

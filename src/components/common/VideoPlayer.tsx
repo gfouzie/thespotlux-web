@@ -123,8 +123,9 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
             {/* Play/Pause Overlay Button */}
             {showPlayButton && (
               <button
+                type="button"
                 onClick={togglePlay}
-                className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity group-hover:opacity-100"
+                className="absolute inset-0 flex items-center justify-center bg-black/30 transition-opacity group-hover:opacity-100 cursor-pointer"
                 aria-label={isPlaying ? "Pause video" : "Play video"}
               >
                 <div className="bg-black/60 rounded-full p-4">
@@ -142,8 +143,9 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
               <div className="flex items-center gap-2">
                 {/* Play/Pause Button */}
                 <button
+                  type="button"
                   onClick={togglePlay}
-                  className="p-2 rounded-full hover:bg-white/20 transition-colors"
+                  className="cursor-pointer p-2 rounded-full hover:bg-white/20 transition-colors"
                   aria-label={isPlaying ? "Pause" : "Play"}
                 >
                   {isPlaying ? (
@@ -155,8 +157,9 @@ const VideoPlayer = forwardRef<HTMLVideoElement, VideoPlayerProps>(
 
                 {/* Mute/Unmute Button */}
                 <button
+                  type="button"
                   onClick={toggleMute}
-                  className="p-2 rounded-full hover:bg-white/20 transition-colors"
+                  className="cursor-pointer p-2 rounded-full hover:bg-white/20 transition-colors"
                   aria-label={isMuted ? "Unmute" : "Mute"}
                 >
                   {isMuted ? (

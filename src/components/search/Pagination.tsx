@@ -31,6 +31,7 @@ export default function Pagination({
       </div>
       <div className="flex items-center gap-2">
         <button
+          type="button"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={!hasPrevious}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-md ${
@@ -46,6 +47,7 @@ export default function Pagination({
           Page {currentPage} of {totalPages}
         </div>
         <button
+          type="button"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={!hasNext}
           className={`flex items-center gap-1 px-3 py-1.5 rounded-md ${

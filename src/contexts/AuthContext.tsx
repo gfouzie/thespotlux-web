@@ -125,16 +125,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout function
   const logout = useCallback(async () => {
     try {
-      if (state.accessToken) {
-        await authApi.logout(state.accessToken);
-      }
+      await authApi.logout();
     } catch (error) {
       console.error("Logout error:", error);
       // Continue with logout even if API call fails
     } finally {
       dispatch({ type: "LOGOUT" });
     }
-  }, [state.accessToken]);
+  }, []);
 
   // Auto-refresh token on mount (if refresh token exists in sessionStorage)
   useEffect(() => {

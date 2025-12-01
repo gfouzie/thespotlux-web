@@ -76,8 +76,9 @@ const MobileNav = ({ className = "" }: MobileNavProps) => {
             </Link>
 
             <button
+              type="button"
               onClick={handleLogout}
-              className="p-2 rounded-lg text-text-col hover:bg-red-500/20 hover:text-red-400 transition-colors"
+              className="cursor-pointer p-2 rounded-lg text-text-col hover:bg-red-500/20 hover:text-red-400 transition-colors"
               title="Logout"
             >
               <LogOut width={20} height={20} />

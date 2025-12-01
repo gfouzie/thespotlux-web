@@ -215,15 +215,17 @@ const AboutSection: React.FC<AboutSectionProps> = ({ isEditMode }) => {
         {isEditMode && hasChanges && (
           <div className="flex items-center space-x-2">
             <button
+              type="button"
               onClick={handleCancel}
-              className="px-3 py-1 text-sm text-text-col opacity-70 hover:opacity-100 transition-opacity"
+              className="cursor-pointer px-3 py-1 text-sm text-text-col opacity-70 hover:opacity-100 transition-opacity"
             >
               Cancel
             </button>
             <button
+              type="button"
               onClick={handleSave}
               disabled={saving}
-              className="px-3 py-1 text-sm bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50"
+              className="cursor-pointer px-3 py-1 text-sm bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50"
             >
               {saving ? "Saving..." : "Save"}
             </button>

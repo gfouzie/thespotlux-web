@@ -1,5 +1,5 @@
 import { config } from "@/lib/config";
-import { apiRequest } from "./shared";
+import { apiRequest, authRequest } from "./shared";
 
 /**
  * Login credentials interface
@@ -38,13 +38,12 @@ export const authApi = {
   /**
    * Logout user
    */
-  logout: async (accessToken: string): Promise<{ message: string }> => {
-    return apiRequest<{ message: string }>(
+  logout: async (): Promise<{ message: string }> => {
+    return authRequest<{ message: string }>(
       `${config.apiBaseUrl}/api/v1/logout`,
       {
         method: "POST",
-      },
-      accessToken
+      }
     );
   },
 

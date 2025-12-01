@@ -28,13 +28,13 @@ export default function HighlightReelGrid({
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide pb-2">
+      <div className="flex items-center gap-4 overflow-x-auto scrollbar-hide pt-3 pb-2 px-1">
         {/* Create New Reel Button (only for owner) */}
         {isOwner && onCreateReel && (
           <div className="flex flex-col items-center gap-2 flex-shrink-0">
             <button
               onClick={onCreateReel}
-              className="w-20 h-20 rounded-full border-2 border-dashed border-text-col/30 hover:border-accent-col hover:bg-accent-col/10 transition-colors flex items-center justify-center group"
+              className="cursor-pointer w-20 h-20 rounded-full border-2 border-dashed border-text-col/30 hover:border-accent-col hover:bg-accent-col/10 transition-colors flex items-center justify-center group"
             >
               <Plus className="w-8 h-8 text-text-col/40 group-hover:text-accent-col transition-colors" />
             </button>

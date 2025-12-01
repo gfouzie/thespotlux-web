@@ -83,8 +83,9 @@ const ProfilePage: React.FC = () => {
             <h1 className="text-3xl font-bold text-text-col">My Profile</h1>
             <div className="flex items-center space-x-3">
               <button
+                type="button"
                 onClick={() => setIsEditMode(!isEditMode)}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                className={`cursor-pointer flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
                   isEditMode
                     ? "bg-component-col text-text-col hover:opacity-80"
                     : "bg-accent-col text-text-col hover:opacity-80"

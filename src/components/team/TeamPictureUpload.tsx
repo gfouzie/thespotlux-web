@@ -134,9 +134,10 @@ const TeamPictureUpload: React.FC<TeamPictureUploadProps> = ({
 
             {currentImageUrl && (
               <button
+                type="button"
                 onClick={handleDelete}
                 disabled={uploading}
-                className="w-full px-4 py-2 bg-bg-col/50 text-text-col rounded-md hover:bg-bg-col transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2 bg-bg-col/50 text-text-col rounded-md hover:bg-bg-col transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Delete Picture
               </button>

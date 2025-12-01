@@ -216,7 +216,7 @@ const CreateTeamForm: React.FC<CreateTeamFormProps> = ({ onTeamCreated }) => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full px-4 py-3 bg-accent-col text-text-col font-medium rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full cursor-pointer px-4 py-3 bg-accent-col text-text-col font-medium rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Creating Team..." : "Create Team"}
         </button>

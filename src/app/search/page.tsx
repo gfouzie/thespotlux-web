@@ -173,20 +173,20 @@ export default function SearchPage() {
               <div className="flex gap-4 border-b border-bg-col">
                 <button
                   onClick={() => handleTabChange("all")}
-                  className={`pb-2 px-4 ${
+                  className={`cursor-pointer pb-2 px-4 ${
                     activeTab === "all"
-                      ? "border-b-2 border-accent-col text-text-col cursor-pointer"
-                      : "text-text-col/60 hover:text-text-col cursor-pointer"
+                      ? "border-b-2 border-accent-col text-text-col"
+                      : "text-text-col/60 hover:text-text-col"
                   }`}
                 >
                   All Users
                 </button>
                 <button
                   onClick={() => handleTabChange("friends")}
-                  className={`pb-2 px-4 ${
+                  className={`cursor-pointer pb-2 px-4 ${
                     activeTab === "friends"
-                      ? "border-b-2 border-accent-col text-text-col cursor-pointer"
-                      : "text-text-col/60 hover:text-text-col cursor-pointer"
+                      ? "border-b-2 border-accent-col text-text-col"
+                      : "text-text-col/60 hover:text-text-col"
                   }`}
                 >
                   Friends ({friendsCount})
