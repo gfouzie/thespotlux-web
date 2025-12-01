@@ -5,7 +5,7 @@ import Modal from "@/components/common/Modal";
 import Select from "@/components/common/Select";
 import Button from "@/components/common/Button";
 import Alert from "@/components/common/Alert";
-import { Xmark, Upload, VideoCamera, Menu } from "iconoir-react";
+import { Xmark, Upload, VideoCamera, Menu, Trash } from "iconoir-react";
 import { HighlightReel, highlightReelsApi } from "@/api/highlightReels";
 import { Highlight, highlightsApi } from "@/api/highlights";
 import { uploadApi } from "@/api/upload";
@@ -34,6 +34,7 @@ export default function EditReelModal({
   const [error, setError] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [reorderedClips, setReorderedClips] = useState<Set<number>>(new Set());
+  const [deletingHighlightId, setDeletingHighlightId] = useState<number | null>(null);
 
   // Load highlights for this reel
   const loadHighlights = async () => {
@@ -96,7 +97,7 @@ export default function EditReelModal({
     setDraggedIndex(index);
   };
 
-  const handleDragOver = (e: React.DragEvent, _index: number) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
   };
 
@@ -126,6 +127,35 @@ export default function EditReelModal({
 
   const handleDragEnd = () => {
     setDraggedIndex(null);
+  };
+
+  const handleDeleteHighlight = async (highlightId: number) => {
+    if (!confirm("Are you sure you want to delete this clip? This action cannot be undone.")) {
+      return;
+    }
+
+    setDeletingHighlightId(highlightId);
+    setError(null);
+
+    try {
+      await highlightsApi.deleteHighlight(highlightId);
+
+      // Remove from local state
+      const updatedHighlights = highlights.filter(h => h.id !== highlightId);
+      setHighlights(updatedHighlights);
+
+      // Remove from reordered clips set if present
+      const updatedReorderedClips = new Set(reorderedClips);
+      updatedReorderedClips.delete(highlightId);
+      setReorderedClips(updatedReorderedClips);
+
+      // Reload highlights to get fresh data with updated order indices
+      await loadHighlights();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete clip");
+    } finally {
+      setDeletingHighlightId(null);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -328,7 +358,7 @@ export default function EditReelModal({
                   key={highlight.id}
                   draggable
                   onDragStart={() => handleDragStart(index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragOver={handleDragOver}
                   onDrop={(e) => handleDrop(e, index)}
                   onDragEnd={handleDragEnd}
                   className={cn(
@@ -366,6 +396,22 @@ export default function EditReelModal({
                       Modified
                     </div>
                   )}
+
+                  {/* Delete Button */}
+                  <Button
+                    type="button"
+                    variant="danger"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteHighlight(highlight.id);
+                    }}
+                    isLoading={deletingHighlightId === highlight.id}
+                    disabled={deletingHighlightId !== null}
+                    className="flex-shrink-0"
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
                 </div>
               ))}
             </div>
