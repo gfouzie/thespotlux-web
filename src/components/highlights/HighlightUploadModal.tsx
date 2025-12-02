@@ -10,6 +10,7 @@ import { highlightsApi, HighlightCreateRequest } from "@/api/highlights";
 import { uploadApi } from "@/api/upload";
 import { promptsApi, Prompt } from "@/api/prompts";
 import { cn } from "@/lib/utils";
+import { compressVideo, validateVideoFile } from "@/lib/compression";
 
 interface HighlightUploadModalProps {
   isOpen: boolean;
@@ -22,10 +23,14 @@ interface HighlightUploadModalProps {
 
 interface FileWithPreview {
   file: File;
+  compressedFile?: File;
   preview: string;
   uploadProgress: number;
-  uploadStatus: "pending" | "uploading" | "success" | "error";
+  compressionProgress: number;
+  uploadStatus: "pending" | "compressing" | "uploading" | "success" | "error";
   errorMessage?: string;
+  originalSize?: number;
+  compressedSize?: number;
 }
 
 export default function HighlightUploadModal({
@@ -82,16 +87,9 @@ export default function HighlightUploadModal({
     const errors: string[] = [];
 
     selectedFiles.forEach((file) => {
-      // Check file type
-      if (!file.type.startsWith("video/")) {
-        errors.push(`${file.name}: Not a video file`);
-        return;
-      }
-
-      // Check file size (max 100MB)
-      const maxSize = 100 * 1024 * 1024;
-      if (file.size > maxSize) {
-        errors.push(`${file.name}: File too large (max 100MB)`);
+      const validation = validateVideoFile(file);
+      if (!validation.valid) {
+        errors.push(`${file.name}: ${validation.error}`);
         return;
       }
 
@@ -99,7 +97,9 @@ export default function HighlightUploadModal({
         file,
         preview: URL.createObjectURL(file),
         uploadProgress: 0,
+        compressionProgress: 0,
         uploadStatus: "pending",
+        originalSize: file.size,
       });
     });
 
@@ -137,20 +137,55 @@ export default function HighlightUploadModal({
       const existingHighlights = await highlightsApi.getHighlightsByReel(selectedReelId);
       const existingCount = existingHighlights.data.length;
 
+      // Track upload results
+      let failureCount = 0;
+
       // Upload each file
       for (let i = 0; i < files.length; i++) {
         const fileWithPreview = files[i];
 
-        // Update status to uploading
-        setFiles((prev) => {
-          const updated = [...prev];
-          updated[i].uploadStatus = "uploading";
-          return updated;
-        });
-
         try {
-          // Upload video to S3
-          const { fileUrl } = await uploadApi.uploadHighlightVideo(selectedReelId, fileWithPreview.file);
+          // Step 1: Compress the video
+          setFiles((prev) => {
+            const updated = [...prev];
+            updated[i].uploadStatus = "compressing";
+            return updated;
+          });
+
+          const { compressedBlob, compressedSize } = await compressVideo(
+            fileWithPreview.file,
+            {}, // Use default compression settings
+            (progress) => {
+              // Update compression progress
+              setFiles((prev) => {
+                const updated = [...prev];
+                updated[i].compressionProgress = progress;
+                return updated;
+              });
+            }
+          );
+
+          // Convert blob to file
+          const compressedFile = new File([compressedBlob], fileWithPreview.file.name, {
+            type: "video/mp4",
+          });
+
+          // Update with compressed file info
+          setFiles((prev) => {
+            const updated = [...prev];
+            updated[i].compressedFile = compressedFile;
+            updated[i].compressedSize = compressedSize;
+            return updated;
+          });
+
+          // Step 2: Upload compressed video to S3
+          setFiles((prev) => {
+            const updated = [...prev];
+            updated[i].uploadStatus = "uploading";
+            return updated;
+          });
+
+          const { fileUrl } = await uploadApi.uploadHighlightVideo(selectedReelId, compressedFile);
 
           // Create highlight record
           const createRequest: HighlightCreateRequest = {
@@ -177,13 +212,13 @@ export default function HighlightUploadModal({
             updated[i].errorMessage = err instanceof Error ? err.message : "Upload failed";
             return updated;
           });
+
+          failureCount++;
         }
       }
 
       // Check if all uploads succeeded
-      const allSucceeded = files.every((f) => f.uploadStatus === "success");
-
-      if (allSucceeded) {
+      if (failureCount === 0) {
         onSuccess();
         handleClose();
       } else {
@@ -241,17 +276,19 @@ export default function HighlightUploadModal({
           onChange={(e) =>
             setSelectedPromptId(e.target.value ? parseInt(e.target.value) : undefined)
           }
-          options={[
-            { value: "", label: "No prompt" },
-            ...(isLoadingPrompts
+          options={
+            isLoadingPrompts
               ? [{ value: "", label: "Loading prompts..." }]
-              : prompts.map((prompt) => ({
-                  value: prompt.id.toString(),
-                  label: prompt.promptCategoryName
-                    ? `${prompt.name} (${prompt.promptCategoryName})`
-                    : prompt.name,
-                })))
-          ]}
+              : [
+                  { value: "", label: "No prompt" },
+                  ...prompts.map((prompt) => ({
+                    value: prompt.id.toString(),
+                    label: prompt.promptCategoryName
+                      ? `${prompt.name} (${prompt.promptCategoryName})`
+                      : prompt.name,
+                  })),
+                ]
+          }
         />
 
         {/* File Upload Area */}
@@ -306,11 +343,16 @@ export default function HighlightUploadModal({
                   </p>
 
                   {/* Status */}
+                  {fileWithPreview.uploadStatus === "compressing" && (
+                    <p className="text-xs text-accent-col">
+                      Compressing... {fileWithPreview.compressionProgress}%
+                    </p>
+                  )}
                   {fileWithPreview.uploadStatus === "uploading" && (
                     <p className="text-xs text-accent-col">Uploading...</p>
                   )}
                   {fileWithPreview.uploadStatus === "success" && (
-                    <p className="text-xs text-green-600">Uploaded</p>
+                      <p className="text-xs text-green-600">Uploaded</p>
                   )}
                   {fileWithPreview.uploadStatus === "error" && (
                     <p className="text-xs text-red-600">

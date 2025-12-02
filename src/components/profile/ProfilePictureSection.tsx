@@ -4,6 +4,7 @@ import React, { useState, useRef } from "react";
 import { Camera, Trash, UploadSquare, Xmark } from "iconoir-react";
 import { uploadApi } from "@/api/upload";
 import { useAuth } from "@/contexts/AuthContext";
+import { compressImage, validateImageFile } from "@/lib/compression";
 
 interface ProfilePictureSectionProps {
   profileImageUrl: string | null;
@@ -50,17 +51,10 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
     const file = event.target.files?.[0];
     if (!file || !isAuthenticated) return;
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-      setError("Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.");
-      return;
-    }
-
-    // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setError("File size exceeds 10MB. Please choose a smaller image.");
+    // Validate file using validation function
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setError(validation.error || "Invalid image file");
       return;
     }
 
@@ -68,9 +62,15 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
       setUploading(true);
       setError(null);
 
-      const response = await uploadApi.uploadProfilePicture(
-        file
+      // Compress the image before uploading (uses default settings)
+      const { compressedFile } = await compressImage(file);
+
+      console.log(
+        `Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ` +
+        `${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`
       );
+
+      const response = await uploadApi.uploadProfilePicture(compressedFile);
 
       onImageUpdate(response.profileImageUrl);
     } catch (err) {

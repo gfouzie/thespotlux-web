@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { uploadApi } from "@/api/upload";
+import { validateImageFile } from "@/lib/compression";
 
 interface TeamPictureUploadProps {
   teamId: number;
@@ -44,17 +45,10 @@ const TeamPictureUpload: React.FC<TeamPictureUploadProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
-    if (!allowedTypes.includes(file.type)) {
-      setError("Invalid file type. Please upload a JPEG, PNG, GIF, or WebP image.");
-      return;
-    }
-
-    // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setError("File size exceeds 10MB limit.");
+    // Validate file using validation function
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      setError(validation.error || "Invalid image file");
       return;
     }
 
