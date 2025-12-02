@@ -40,8 +40,8 @@ export default function EditReelModal({
   const loadHighlights = async () => {
     setIsLoadingHighlights(true);
     try {
-      const response = await highlightsApi.getHighlightsByReel(reel.id);
-      const sorted = response.data.sort((a, b) => a.orderIndex - b.orderIndex);
+      const highlights = await highlightsApi.getHighlightsByReel(reel.id);
+      const sorted = highlights?.sort((a, b) => a.orderIndex - b.orderIndex);
       setHighlights(sorted);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load highlights");

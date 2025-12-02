@@ -79,13 +79,13 @@ export default function FriendsPreview({ userId, isOwnProfile = false }: Friends
         )}
       </div>
 
-      {friends.length === 0 ? (
+      {friends?.length === 0 ? (
         <div className="text-text-col/50 text-sm">
           {isOwnProfile ? "You have no friends yet" : "No friends to show"}
         </div>
       ) : (
         <div className="grid grid-cols-3 gap-2">
-          {friends.map((friend) => (
+          {friends?.map((friend) => (
             <Link
               key={friend.id}
               href={`/profile/${friend.username}`}

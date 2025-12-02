@@ -27,9 +27,9 @@ export default function HighlightClipManager({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await highlightsApi.getHighlightsByReel(reel.id);
+      const highlights = await highlightsApi.getHighlightsByReel(reel.id);
       // Sort by order_index
-      const sorted = response.data.sort((a, b) => a.orderIndex - b.orderIndex);
+      const sorted = highlights?.sort((a, b) => a.orderIndex - b.orderIndex);
       setHighlights(sorted);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load highlights");

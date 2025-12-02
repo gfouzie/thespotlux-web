@@ -27,27 +27,27 @@ export interface PromptCategoryUpdateRequest {
 }
 
 /**
- * Paginated response for prompt categories
+ * Query parameters for fetching prompt categories
  */
-export interface PaginatedPromptCategoriesResponse {
-  data: PromptCategory[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  totalPages: number;
+export interface GetPromptCategoriesParams {
+  offset?: number;
+  limit?: number;
+  searchText?: string;
 }
 
 export const promptCategoriesApi = {
   /**
-   * Get all prompt categories
+   * Get prompt categories with pagination and filtering
    */
-  getPromptCategories: async (
-    page: number = 1,
-    itemsPerPage: number = 100
-  ): Promise<PaginatedPromptCategoriesResponse> => {
-    return authRequest<PaginatedPromptCategoriesResponse>(
-      `${config.apiBaseUrl}/api/v1/prompt_categories?page=${page}&items_per_page=${itemsPerPage}`
-    );
+  getPromptCategories: async (params?: GetPromptCategoriesParams): Promise<PromptCategory[]> => {
+    const queryParams = new URLSearchParams();
+
+    if (params?.offset !== undefined) queryParams.append("offset", params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append("limit", params.limit.toString());
+    if (params?.searchText) queryParams.append("searchText", params.searchText);
+
+    const url = `${config.apiBaseUrl}/api/v1/prompt_categories${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    return authRequest<PromptCategory[]>(url);
   },
 
   /**

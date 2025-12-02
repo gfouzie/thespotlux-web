@@ -32,35 +32,32 @@ export interface PromptUpdate {
   featuredEndDate?: string;
 }
 
-export interface PaginatedPromptsResponse {
-  data: Prompt[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  hasMore: boolean;
+/**
+ * Query parameters for fetching prompts
+ */
+export interface GetPromptsParams {
+  sport?: string;
+  offset?: number;
+  limit?: number;
+  searchText?: string;
 }
 
 export const promptsApi = {
-  async getPrompts(
-    page: number = 1,
-    itemsPerPage: number = 50,
-    sport?: string
-  ): Promise<PaginatedPromptsResponse> {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
+  /**
+   * Get prompts with pagination and filtering
+   */
+  async getPrompts(params?: GetPromptsParams): Promise<Prompt[]> {
+    const queryParams = new URLSearchParams();
+
+    if (params?.sport) queryParams.append("sport", params.sport);
+    if (params?.offset !== undefined) queryParams.append("offset", params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append("limit", params.limit.toString());
+    if (params?.searchText) queryParams.append("searchText", params.searchText);
+
+    const url = `${config.apiBaseUrl}/api/v1/prompts${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    return authRequest<Prompt[]>(url, {
+      cache: "no-store",
     });
-
-    if (sport) {
-      params.append("sport", sport);
-    }
-
-    return authRequest<PaginatedPromptsResponse>(
-      `${config.apiBaseUrl}/api/v1/prompts?${params}`,
-      {
-        cache: "no-store",
-      }
-    );
   },
 
   async createPrompt(prompt: PromptCreate): Promise<Prompt> {

@@ -27,22 +27,6 @@ export interface FriendshipStatusResponse {
   friendshipId?: number | null;
 }
 
-export interface PaginatedFriendshipsResponse {
-  data: Friendship[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  hasMore: boolean;
-}
-
-export interface PaginatedUsersResponse {
-  data: UserProfile[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  hasMore: boolean;
-}
-
 export const friendshipsApi = {
   // Send friend request
   async sendFriendRequest(
@@ -59,15 +43,15 @@ export const friendshipsApi = {
 
   // Get received friend requests
   async getReceivedRequests(
-    page: number = 1,
-    itemsPerPage: number = 20
-  ): Promise<PaginatedFriendshipsResponse> {
+    offset: number = 0,
+    limit: number = 20
+  ): Promise<Friendship[]> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
+      offset: offset.toString(),
+      limit: limit.toString(),
     });
 
-    return authRequest<PaginatedFriendshipsResponse>(
+    return authRequest<Friendship[]>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests/received?${params}`,
       {
         cache: "no-store",
@@ -77,15 +61,15 @@ export const friendshipsApi = {
 
   // Get sent friend requests
   async getSentRequests(
-    page: number = 1,
-    itemsPerPage: number = 20
-  ): Promise<PaginatedFriendshipsResponse> {
+    offset: number = 0,
+    limit: number = 20
+  ): Promise<Friendship[]> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
+      offset: offset.toString(),
+      limit: limit.toString(),
     });
 
-    return authRequest<PaginatedFriendshipsResponse>(
+    return authRequest<Friendship[]>(
       `${config.apiBaseUrl}/api/v1/user/friends/requests/sent?${params}`,
       {
         cache: "no-store",
@@ -115,15 +99,15 @@ export const friendshipsApi = {
 
   // Get my friends list
   async getMyFriends(
-    page: number = 1,
-    itemsPerPage: number = 20
-  ): Promise<PaginatedUsersResponse> {
+    offset: number = 0,
+    limit: number = 20
+  ): Promise<UserProfile[]> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
+      offset: offset.toString(),
+      limit: limit.toString(),
     });
 
-    return authRequest<PaginatedUsersResponse>(
+    return authRequest<UserProfile[]>(
       `${config.apiBaseUrl}/api/v1/user/friends?${params}`,
       {
         cache: "no-store",
@@ -144,15 +128,15 @@ export const friendshipsApi = {
   // Get another user's friends list
   async getUserFriends(
     userId: number,
-    page: number = 1,
-    itemsPerPage: number = 20
-  ): Promise<PaginatedUsersResponse> {
+    offset: number = 0,
+    limit: number = 20
+  ): Promise<UserProfile[]> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
+      offset: offset.toString(),
+      limit: limit.toString(),
     });
 
-    return authRequest<PaginatedUsersResponse>(
+    return authRequest<UserProfile[]>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/friends?${params}`,
       {
         cache: "no-store",
@@ -175,15 +159,15 @@ export const friendshipsApi = {
   // Get mutual friends with a user
   async getMutualFriends(
     userId: number,
-    page: number = 1,
-    itemsPerPage: number = 20
-  ): Promise<PaginatedUsersResponse> {
+    offset: number = 0,
+    limit: number = 20
+  ): Promise<UserProfile[]> {
     const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
+      offset: offset.toString(),
+      limit: limit.toString(),
     });
 
-    return authRequest<PaginatedUsersResponse>(
+    return authRequest<UserProfile[]>(
       `${config.apiBaseUrl}/api/v1/users/${userId}/mutual-friends?${params}`,
       {
         cache: "no-store",

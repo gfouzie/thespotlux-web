@@ -53,8 +53,8 @@ export default function HighlightUploadModal({
   const loadPrompts = useCallback(async () => {
     setIsLoadingPrompts(true);
     try {
-      const response = await promptsApi.getPrompts(1, 100, sport);
-      setPrompts(response.data);
+      const prompts = await promptsApi.getPrompts({ sport, limit: 100 });
+      setPrompts(prompts);
     } catch (err) {
       console.error("Failed to load prompts:", err);
     } finally {
@@ -135,7 +135,7 @@ export default function HighlightUploadModal({
     try {
       // Get existing highlights count for the selected reel
       const existingHighlights = await highlightsApi.getHighlightsByReel(selectedReelId);
-      const existingCount = existingHighlights.data.length;
+      const existingCount = existingHighlights.length;
 
       // Track upload results
       let failureCount = 0;

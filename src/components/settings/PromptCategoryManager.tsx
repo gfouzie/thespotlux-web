@@ -24,8 +24,8 @@ export default function PromptCategoryManager() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await promptCategoriesApi.getPromptCategories();
-      setCategories(response.data);
+      const categories = await promptCategoriesApi.getPromptCategories();
+      setCategories(categories);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load categories");
     } finally {

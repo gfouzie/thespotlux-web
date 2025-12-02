@@ -55,34 +55,42 @@ export interface HighlightBulkReorderRequest {
 }
 
 /**
- * Paginated response for highlights
+ * Query parameters for fetching highlights
  */
-export interface PaginatedHighlightsResponse {
-  data: Highlight[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  totalPages: number;
+export interface GetHighlightsParams {
+  highlightReelId?: number;
+  promptId?: number;
+  offset?: number;
+  limit?: number;
+  searchText?: string;
 }
 
 export const highlightsApi = {
   /**
-   * Get all highlights for a specific reel
+   * Get highlights with pagination and filtering
+   */
+  getHighlights: async (params?: GetHighlightsParams): Promise<Highlight[]> => {
+    const queryParams = new URLSearchParams();
+
+    if (params?.highlightReelId) queryParams.append("highlight_reel_id", params.highlightReelId.toString());
+    if (params?.promptId) queryParams.append("prompt_id", params.promptId.toString());
+    if (params?.offset !== undefined) queryParams.append("offset", params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append("limit", params.limit.toString());
+    if (params?.searchText) queryParams.append("searchText", params.searchText);
+
+    const url = `${config.apiBaseUrl}/api/v1/highlights${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    return authRequest<Highlight[]>(url);
+  },
+
+  /**
+   * Get all highlights for a specific reel (legacy method for backwards compatibility)
    */
   getHighlightsByReel: async (
     reelId: number,
-    page: number = 1,
-    itemsPerPage: number = 100
-  ): Promise<PaginatedHighlightsResponse> => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
-      highlight_reel_id: reelId.toString(),
-    });
-
-    return authRequest<PaginatedHighlightsResponse>(
-      `${config.apiBaseUrl}/api/v1/highlights?${params}`
-    );
+    offset: number = 0,
+    limit: number = 100
+  ): Promise<Highlight[]> => {
+    return highlightsApi.getHighlights({ highlightReelId: reelId, offset, limit });
   },
 
   /**

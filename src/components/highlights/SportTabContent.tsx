@@ -60,8 +60,8 @@ export default function SportTabContent({
 
   const handleReelClick = async (reel: HighlightReel) => {
     try {
-      const response = await highlightsApi.getHighlightsByReel(reel.id);
-      const sorted = response.data.sort((a, b) => a.orderIndex - b.orderIndex);
+      const highlights = await highlightsApi.getHighlightsByReel(reel.id);
+      const sorted = highlights?.sort((a, b) => a.orderIndex - b.orderIndex);
 
       if (sorted.length === 0) {
         // No clips yet - if owner, show clip manager

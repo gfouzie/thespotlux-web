@@ -28,8 +28,8 @@ export default function FriendsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getMyFriends(1, 100);
-      setFriends(response.data);
+      const friends = await friendshipsApi.getMyFriends(0, 100);
+      setFriends(friends);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load friends");
     } finally {
@@ -43,8 +43,8 @@ export default function FriendsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getReceivedRequests(1, 100);
-      setReceivedRequests(response.data);
+      const requests = await friendshipsApi.getReceivedRequests(0, 100);
+      setReceivedRequests(requests);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load requests");
     } finally {
@@ -58,8 +58,8 @@ export default function FriendsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getSentRequests(1, 100);
-      setSentRequests(response.data);
+      const requests = await friendshipsApi.getSentRequests(0, 100);
+      setSentRequests(requests);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to load sent requests"
@@ -125,7 +125,7 @@ export default function FriendsPage() {
     }
   };
 
-  const filteredFriends = friends.filter((friend) =>
+  const filteredFriends = friends?.filter((friend) =>
     `${friend.firstName} ${friend.lastName} ${friend.username}`
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
@@ -152,7 +152,7 @@ export default function FriendsPage() {
                 : "text-text-col/60 hover:text-text-col"
             }`}
           >
-            Friends ({friends.length})
+            Friends ({friends?.length})
           </button>
           <button
             onClick={() => setActiveTab("received")}
@@ -190,7 +190,7 @@ export default function FriendsPage() {
               <div className="text-center text-text-col">
                 Loading friends...
               </div>
-            ) : filteredFriends.length === 0 ? (
+            ) : filteredFriends?.length === 0 ? (
               <div className="text-center text-text-col/50">
                 {searchQuery
                   ? "No friends found matching your search"
@@ -198,7 +198,7 @@ export default function FriendsPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredFriends.map((friend) => (
+                {filteredFriends?.map((friend) => (
                   <div
                     key={friend.id}
                     className="p-4 bg-bg-col/30 rounded border border-bg-col hover:bg-bg-col/50 flex justify-between items-center"

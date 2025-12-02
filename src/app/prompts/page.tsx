@@ -41,8 +41,8 @@ export default function PromptsPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await promptsApi.getPrompts();
-      setPrompts(response.data);
+      const prompts = await promptsApi.getPrompts();
+      setPrompts(prompts);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load prompts");
     } finally {
@@ -69,8 +69,8 @@ export default function PromptsPage() {
 
   const loadCategories = useCallback(async () => {
     try {
-      const response = await promptCategoriesApi.getPromptCategories();
-      setCategories(response.data);
+      const categories = await promptCategoriesApi.getPromptCategories();
+      setCategories(categories);
     } catch (err) {
       console.error("Failed to load categories:", err);
     }
