@@ -20,8 +20,8 @@ const MobileNav = ({ className = "" }: MobileNavProps) => {
 
   const logoSrc =
     theme === "light"
-      ? "/thespotlux_logo_light.png"
-      : "/thespotlux_logo_dark.png";
+      ? "/spotlux_logo_light.png"
+      : "/spotlux_logo_dark.png";
 
   const handleLogout = async () => {
     try {

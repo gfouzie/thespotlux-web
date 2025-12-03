@@ -45,13 +45,13 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
 
   const logoSrc =
     theme === "light"
-      ? "/thespotlux_logo_light.png"
-      : "/thespotlux_logo_dark.png";
+      ? "/spotlux_logo_light.png"
+      : "/spotlux_logo_dark.png";
 
   const iconSrc =
     theme === "light"
-      ? "/thespotlux_icon_light.png"
-      : "/thespotlux_icon_dark.png";
+      ? "/spotlux_icon_light.png"
+      : "/spotlux_icon_dark.png";
 
   const handleLogout = async () => {
     try {

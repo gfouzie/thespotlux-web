@@ -23,10 +23,10 @@ const martelSans = Martel_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "The Spotlux",
+  title: "Spotlux",
   description: "Shining on the future",
   icons: {
-    icon: "/thespotlux_favicon.ico",
+    icon: "/spotlux_favicon.ico",
   },
 };
 
@@ -38,8 +38,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/thespotlux_favicon.ico" />
-        <link rel="shortcut icon" href="/thespotlux_favicon.ico" />
+        <link rel="icon" href="/spotlux_favicon.ico" />
+        <link rel="shortcut icon" href="/spotlux_favicon.ico" />
         <script
           dangerouslySetInnerHTML={{
             __html: `

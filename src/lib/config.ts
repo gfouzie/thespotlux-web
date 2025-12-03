@@ -1,7 +1,7 @@
 function getApiBaseUrl(): string {
   // Environment-specific base URLs
   if (process.env.NODE_ENV === "production") {
-    return process.env.NEXT_PUBLIC_API_URL || "https://api.thespotlux.com";
+    return process.env.NEXT_PUBLIC_API_URL || "https://api.spotlux.app";
   }
 
   // Development default

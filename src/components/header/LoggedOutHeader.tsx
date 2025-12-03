@@ -7,8 +7,8 @@ export default function LoggedOutHeader() {
 
   const logoSrc =
     theme === "light"
-      ? "/thespotlux_logo_light.png"
-      : "/thespotlux_logo_dark.png";
+      ? "/spotlux_logo_light.png"
+      : "/spotlux_logo_dark.png";
 
   console.log(logoSrc);
   return (
