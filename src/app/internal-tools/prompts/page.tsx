@@ -1,9 +1,7 @@
 "use client";
 
-import { useUser } from "@/contexts/UserContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
 import { promptsApi, type Prompt, type PromptCreate } from "@/api/prompts";
 import { promptCategoriesApi, type PromptCategory } from "@/api/promptCategories";
@@ -15,9 +13,7 @@ import Textarea from "@/components/common/Textarea";
 import Alert from "@/components/common/Alert";
 
 export default function PromptsPage() {
-  const { isLoading: userLoading, isSuperuser } = useUser();
   const { isAuthenticated } = useAuth();
-  const router = useRouter();
 
   const [prompts, setPrompts] = useState<Prompt[]>([]);
   const [sports, setSports] = useState<string[]>([]);
@@ -77,18 +73,12 @@ export default function PromptsPage() {
   }, []);
 
   useEffect(() => {
-    if (!userLoading && !isSuperuser) {
-      router.push("/");
-    }
-  }, [userLoading, isSuperuser, router]);
-
-  useEffect(() => {
-    if (isAuthenticated && isSuperuser) {
+    if (isAuthenticated) {
       loadPrompts();
       loadSports();
       loadCategories();
     }
-  }, [isAuthenticated, isSuperuser, loadPrompts, loadSports, loadCategories]);
+  }, [isAuthenticated, loadPrompts, loadSports, loadCategories]);
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,20 +150,6 @@ export default function PromptsPage() {
     setEditingId(null);
     setShowCreateForm(false);
   };
-
-  if (userLoading) {
-    return (
-      <AuthenticatedLayout>
-        <div className="flex items-center justify-center h-screen">
-          <div className="text-text-col">Loading...</div>
-        </div>
-      </AuthenticatedLayout>
-    );
-  }
-
-  if (!isSuperuser) {
-    return null;
-  }
 
   return (
     <AuthenticatedLayout>
@@ -325,3 +301,4 @@ export default function PromptsPage() {
     </AuthenticatedLayout>
   );
 }
+

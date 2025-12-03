@@ -74,23 +74,51 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
     name: string;
     href: string;
     icon: React.ComponentType<{ width?: number; height?: number }>;
+    children?: readonly NavItemType[];
   };
 
   const NavItem = ({ item }: { item: NavItemType }) => {
     const IconComponent = item.icon;
+    const hasChildren = item.children && item.children.length > 0;
+    
     return (
-      <Link
-        href={item.href}
-        className={`flex items-center px-4 py-3 rounded-lg group ${
-          isActive(item.href)
-            ? "border-l-4 border-accent-col bg-bg-col/30"
-            : "hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
-        } ${!isCollapsed ? "space-x-3" : "justify-center"} text-text-col`}
-        title={isCollapsed ? item.name : undefined}
-      >
-        <IconComponent width={24} height={24} />
-        {!isCollapsed && <span className="font-medium">{item.name}</span>}
-      </Link>
+      <div>
+        <Link
+          href={item.href}
+          className={`flex items-center px-4 py-3 rounded-lg group ${
+            isActive(item.href)
+              ? "border-l-4 border-accent-col bg-bg-col/30"
+              : "hover:bg-bg-col/50 hover:border-l-4 hover:border-accent-col/50"
+          } ${!isCollapsed ? "space-x-3" : "justify-center"} text-text-col`}
+          title={isCollapsed ? item.name : undefined}
+        >
+          <IconComponent width={24} height={24} />
+          {!isCollapsed && <span className="font-medium">{item.name}</span>}
+        </Link>
+        
+        {/* Render child items if they exist and sidebar is not collapsed */}
+        {hasChildren && !isCollapsed && (
+          <div className="ml-4 mt-1 space-y-1">
+            {item.children?.map((child) => {
+              const ChildIconComponent = child.icon;
+              return (
+                <Link
+                  key={child.name}
+                  href={child.href}
+                  className={`flex items-center px-4 py-2 rounded-lg text-sm ${
+                    isActive(child.href)
+                      ? "bg-accent-col/20 text-accent-col"
+                      : "hover:bg-bg-col/30 text-text-col/80 hover:text-text-col"
+                  }`}
+                >
+                  <ChildIconComponent width={20} height={20} />
+                  <span className="ml-3">{child.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        )}
+      </div>
     );
   };
 
