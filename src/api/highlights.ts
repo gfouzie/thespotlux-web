@@ -9,7 +9,6 @@ export interface Highlight {
   id: number;
   highlightReelId: number;
   videoUrl: string;
-  thumbnailUrl?: string;
   orderIndex: number;
   promptId?: number;
   promptName?: string;
@@ -23,7 +22,6 @@ export interface Highlight {
 export interface HighlightCreateRequest {
   highlightReelId: number;
   videoUrl: string;
-  thumbnailUrl?: string;
   orderIndex: number;
   promptId?: number;
 }
@@ -33,7 +31,6 @@ export interface HighlightCreateRequest {
  */
 export interface HighlightUpdateRequest {
   videoUrl?: string;
-  thumbnailUrl?: string;
   orderIndex?: number;
   promptId?: number;
 }

@@ -76,13 +76,13 @@ export default function RequestsCard() {
         <div className="flex items-center justify-center py-8">
           <div className="w-6 h-6 border-4 border-accent-col border-t-transparent rounded-full animate-spin"></div>
         </div>
-      ) : requests.length === 0 ? (
+      ) : requests?.length === 0 ? (
         <div className="text-center py-8 text-text-col/50 text-sm">
           No pending requests
         </div>
       ) : (
         <div className="space-y-3 max-h-[600px] overflow-y-auto">
-          {requests.map((request) => (
+          {requests?.map((request) => (
             <div
               key={request.id}
               className="p-3 bg-bg-col/30 rounded border border-bg-col"

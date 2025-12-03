@@ -162,7 +162,7 @@ export default function FriendsPage() {
                 : "text-text-col/60 hover:text-text-col"
             }`}
           >
-            Requests ({receivedRequests.length})
+            Requests ({receivedRequests?.length})
           </button>
           <button
             onClick={() => setActiveTab("sent")}
@@ -172,7 +172,7 @@ export default function FriendsPage() {
                 : "text-text-col/60 hover:text-text-col"
             }`}
           >
-            Sent ({sentRequests.length})
+            Sent ({sentRequests?.length})
           </button>
         </div>
 
@@ -246,13 +246,13 @@ export default function FriendsPage() {
               <div className="text-center text-text-col">
                 Loading requests...
               </div>
-            ) : receivedRequests.length === 0 ? (
+            ) : receivedRequests?.length === 0 ? (
               <div className="text-center text-text-col/50">
                 No pending friend requests
               </div>
             ) : (
               <div className="space-y-2">
-                {receivedRequests.map((request) => (
+                {receivedRequests?.map((request) => (
                   <div
                     key={request.id}
                     className="p-4 bg-bg-col/30 rounded border border-bg-col flex justify-between items-center"
@@ -294,13 +294,13 @@ export default function FriendsPage() {
               <div className="text-center text-text-col">
                 Loading sent requests...
               </div>
-            ) : sentRequests.length === 0 ? (
+            ) : sentRequests?.length === 0 ? (
               <div className="text-center text-text-col/50">
                 No pending sent requests
               </div>
             ) : (
               <div className="space-y-2">
-                {sentRequests.map((request) => (
+                {sentRequests?.map((request) => (
                   <div
                     key={request.id}
                     className="p-4 bg-bg-col/30 rounded border border-bg-col flex justify-between items-center"
