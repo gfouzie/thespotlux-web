@@ -131,7 +131,7 @@ export default function PromptCategoryManager() {
               label="Category Name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              placeholder="e.g., Trick Shots, Skills, Game Highlights"
+              placeholder="e.g., Game, Practice, Drill"
               required
             />
           </div>
