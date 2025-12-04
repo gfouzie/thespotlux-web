@@ -204,7 +204,7 @@ export default function EditReelModal({
         updateData.visibility = visibility;
       }
 
-      if (Object.keys(updateData).length > 0) {
+      if (Object.keys(updateData)?.length > 0) {
         await highlightReelsApi.updateHighlightReel(reel.id, updateData);
       }
 
@@ -334,9 +334,9 @@ export default function EditReelModal({
         {/* Clip Reordering Section */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-text-col">
-            Reorder Clips ({highlights.length})
+            Reorder Clips ({highlights?.length})
           </label>
-          {highlights.length > 0 && (
+          {highlights?.length > 0 && (
             <p className="text-xs text-text-col/60">
               Drag and drop clips to reorder them
             </p>
@@ -346,14 +346,14 @@ export default function EditReelModal({
             <div className="text-center py-8">
               <p className="text-sm text-text-col/60">Loading clips...</p>
             </div>
-          ) : highlights.length === 0 ? (
+          ) : highlights?.length === 0 ? (
             <div className="text-center py-8 bg-bg-col/30 rounded-lg border border-bg-col">
               <VideoCamera className="w-12 h-12 text-text-col/20 mx-auto mb-2" />
               <p className="text-sm text-text-col/60">No clips in this reel yet</p>
             </div>
           ) : (
             <div className="space-y-2 max-h-80 overflow-y-auto">
-              {highlights.map((highlight, index) => (
+              {highlights?.map((highlight, index) => (
                 <div
                   key={highlight.id}
                   draggable
@@ -383,7 +383,7 @@ export default function EditReelModal({
                     <p className="text-sm text-text-col font-medium">
                       Clip #{index + 1}
                     </p>
-                    {highlight.promptName && (
+                    {highlight?.promptName && (
                       <p className="text-xs text-text-col/60 truncate">
                         {highlight.promptName}
                       </p>
@@ -391,7 +391,7 @@ export default function EditReelModal({
                   </div>
 
                   {/* Reordered indicator */}
-                  {reorderedClips.has(highlight.id) && (
+                  {reorderedClips.has(highlight?.id) && (
                     <div className="text-xs text-accent-col font-medium">
                       Modified
                     </div>

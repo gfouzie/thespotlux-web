@@ -152,20 +152,20 @@ export default function PromptCategoryManager() {
       )}
 
       <div className="space-y-2">
-        {categories.length === 0 ? (
+        {categories?.length === 0 ? (
           <p className="text-text-col/60 text-center py-8">
             No categories yet. Create your first category above.
           </p>
         ) : (
-          categories.map((category) => (
+          categories?.map((category) => (
             <div
               key={category.id}
               className="flex items-center justify-between p-4 bg-bg-col/30 rounded border border-bg-col hover:bg-bg-col/50 transition-colors"
             >
               <div>
-                <h3 className="text-text-col font-medium">{category.name}</h3>
+                <h3 className="text-text-col font-medium">{category?.name}</h3>
                 <p className="text-text-col/60 text-sm">
-                  Created {new Date(category.createdAt).toLocaleDateString()}
+                  Created {new Date(category?.createdAt).toLocaleDateString()}
                 </p>
               </div>
 
@@ -180,7 +180,7 @@ export default function PromptCategoryManager() {
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => handleDelete(category.id)}
+                  onClick={() => handleDelete(category?.id)}
                 >
                   Delete
                 </Button>

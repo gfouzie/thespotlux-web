@@ -26,7 +26,7 @@ export default function UserList({
     );
   }
 
-  if (users.length === 0) {
+  if (users?.length === 0) {
     return (
       <div className="text-center py-12 text-text-col/50">
         {emptyMessage}
@@ -36,7 +36,7 @@ export default function UserList({
 
   return (
     <div className="space-y-2">
-      {users.map((user) => (
+      {users?.map((user) => (
         <UserListItem
           key={user.id}
           user={user}

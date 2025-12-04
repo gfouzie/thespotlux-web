@@ -52,8 +52,8 @@ const TeamsList: React.FC = () => {
       }
 
       // If we got fewer teams than requested, there are no more teams to load
-      setHasMore(newTeams.length === TEAMS_PER_PAGE);
-      setOffset(currentOffset + newTeams.length);
+      setHasMore(newTeams?.length === TEAMS_PER_PAGE);
+      setOffset(currentOffset + newTeams?.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load teams");
     } finally {
@@ -89,7 +89,7 @@ const TeamsList: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold text-text-col">Teams List</h2>
           <p className="text-text-col/60 text-sm mt-1">
-            {teams.length} team{teams.length !== 1 ? "s" : ""}{" "}
+            {teams?.length} team{teams?.length !== 1 ? "s" : ""}{" "}
             {selectedSport !== "all" && `in ${selectedSport}`}
             {hasMore && " (more available)"}
           </p>
@@ -150,7 +150,7 @@ const TeamsList: React.FC = () => {
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {teams.map((team) => (
+            {teams?.map((team) => (
               <TeamCard
                 key={team.id}
                 team={team}
@@ -181,7 +181,7 @@ const TeamsList: React.FC = () => {
           )}
 
           {/* End of Results Message */}
-          {!hasMore && teams.length > 0 && (
+          {!hasMore && teams?.length > 0 && (
             <div className="text-center mt-6">
               <p className="text-text-col/60 text-sm">
                 You&apos;ve reached the end of the list

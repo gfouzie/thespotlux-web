@@ -65,7 +65,7 @@ export default function HighlightClipManager({
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-text-col">
-          Manage Clips ({highlights.length})
+          Manage Clips ({highlights?.length})
         </h3>
         <Button onClick={onUploadClick} size="sm">
           <Plus className="w-4 h-4 mr-2" />
@@ -79,7 +79,7 @@ export default function HighlightClipManager({
         </Alert>
       )}
 
-      {highlights.length === 0 ? (
+      {highlights?.length === 0 ? (
         <div className="text-center py-12 bg-bg-col/30 rounded-lg border border-bg-col">
           <VideoCamera className="w-16 h-16 text-text-col/20 mx-auto mb-4" />
           <p className="text-text-col/60 mb-4">No clips yet</p>
@@ -90,7 +90,7 @@ export default function HighlightClipManager({
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-          {highlights.map((highlight, index) => (
+          {highlights?.map((highlight, index) => (
             <div
               key={highlight.id}
               className="relative group bg-bg-col/30 rounded-lg overflow-hidden border border-bg-col hover:border-accent-col/50 transition-colors"
@@ -122,10 +122,10 @@ export default function HighlightClipManager({
               </div>
 
               {/* Prompt Info */}
-              {highlight.promptName && (
+              {highlight?.promptName && (
                 <div className="p-2 bg-card-col">
                   <p className="text-xs text-text-col/80 truncate">
-                    {highlight.promptName}
+                    {highlight?.promptName}
                   </p>
                 </div>
               )}

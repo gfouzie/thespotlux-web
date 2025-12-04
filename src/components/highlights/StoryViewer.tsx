@@ -21,9 +21,9 @@ export default function StoryViewer({
   const [progress, setProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  const currentHighlight = highlights[currentIndex];
+  const currentHighlight = highlights?.[currentIndex];
   const isFirst = currentIndex === 0;
-  const isLast = currentIndex === highlights.length - 1;
+  const isLast = currentIndex === highlights?.length - 1;
 
   // Navigation handlers
   const goToNext = useCallback(() => {
@@ -145,7 +145,7 @@ export default function StoryViewer({
     <div className="fixed inset-0 z-50 bg-black">
       {/* Progress Bars */}
       <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-10">
-        {highlights.map((_, index) => (
+        {highlights?.map((_, index) => (
           <div
             key={index}
             className="flex-1 h-1 bg-white/30 rounded-full overflow-hidden"
@@ -170,7 +170,7 @@ export default function StoryViewer({
         <div className="flex items-center gap-3">
           <h2 className="text-white font-semibold">{reelName}</h2>
           <span className="text-white/60 text-sm">
-            {currentIndex + 1}/{highlights.length}
+            {currentIndex + 1}/{highlights?.length}
           </span>
         </div>
 
@@ -201,7 +201,7 @@ export default function StoryViewer({
       <div className="absolute inset-0 flex items-center justify-center">
         <video
           ref={videoRef}
-          src={currentHighlight.videoUrl}
+          src={currentHighlight?.videoUrl}
           className="max-w-full max-h-full object-contain"
           muted={isMuted}
           playsInline
@@ -233,12 +233,12 @@ export default function StoryViewer({
       )}
 
       {/* Prompt Overlay */}
-      {currentHighlight.promptName && (
+      {currentHighlight?.promptName && (
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
           <div className="max-w-2xl mx-auto">
             <p className="text-sm text-white/60 mb-1">Prompt</p>
             <p className="text-lg text-white font-medium">
-              {currentHighlight.promptName}
+              {currentHighlight?.promptName}
             </p>
           </div>
         </div>

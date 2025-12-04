@@ -54,8 +54,8 @@ export default function PromptsPage() {
       setSports(sportValues);
 
       // Set default sport for form if not already set
-      if (sportValues.length > 0 && !formData.sport) {
-        setFormData((prev) => ({ ...prev, sport: sportValues[0] }));
+      if (sportValues?.length > 0 && !formData.sport) {
+        setFormData((prev) => ({ ...prev, sport: sportValues?.[0] }));
       }
     } catch (err) {
       console.error("Failed to load sports:", err);
@@ -99,7 +99,7 @@ export default function PromptsPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create prompt");
     }
-  };
+  };  
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,9 +196,9 @@ export default function PromptsPage() {
                   setFormData({ ...formData, sport: e.target.value })
                 }
                 options={
-                  sports.length === 0
+                  sports?.length === 0
                     ? [{ value: "", label: "Loading sports..." }]
-                    : sports.map((sport) => ({
+                    : sports?.map((sport) => ({
                         value: sport,
                         label: sport.charAt(0).toUpperCase() + sport.slice(1),
                       }))
@@ -217,9 +217,9 @@ export default function PromptsPage() {
                 }
                 options={[
                   { value: "", label: "None" },
-                  ...(categories.length === 0
+                  ...(categories?.length === 0
                     ? [{ value: "", label: "No categories available" }]
-                    : categories.map((category) => ({
+                    : categories?.map((category) => ({
                         value: category.id.toString(),
                         label: category.name,
                       })))
@@ -249,13 +249,13 @@ export default function PromptsPage() {
 
         {isLoading ? (
           <div className="text-center text-text-col">Loading prompts...</div>
-        ) : prompts.length === 0 ? (
+        ) : prompts?.length === 0 ? (
           <div className="text-center text-text-col">
             No prompts yet. Create one to get started!
           </div>
         ) : (
           <div className="space-y-2">
-            {prompts.map((prompt) => (
+            {prompts?.map((prompt) => (
               <div
                 key={prompt.id}
                 className="p-4 bg-bg-col/30 rounded border border-bg-col hover:bg-bg-col/50"
@@ -267,11 +267,11 @@ export default function PromptsPage() {
                     </h3>
                     <div className="text-sm text-text-col/60 mt-1">
                       Sport: {prompt.sport}
-                      {prompt.promptCategoryName && (
+                      {prompt?.promptCategoryName && (
                         <> • Category: {prompt.promptCategoryName}</>
                       )}
                     </div>
-                    {prompt.description && (
+                    {prompt?.description && (
                       <p className="text-text-col/80 mt-2">
                         {prompt.description}
                       </p>

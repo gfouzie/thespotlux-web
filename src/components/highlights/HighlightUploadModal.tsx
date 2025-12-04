@@ -66,8 +66,8 @@ export default function HighlightUploadModal({
     if (isOpen) {
       loadPrompts();
       // Set default reel if not provided
-      if (!selectedReelId && reels.length > 0) {
-        setSelectedReelId(reels[0].id);
+      if (!selectedReelId && reels?.length > 0) {
+        setSelectedReelId(reels?.[0]?.id);
       }
     }
   }, [isOpen, loadPrompts, reels, selectedReelId]);
@@ -103,7 +103,7 @@ export default function HighlightUploadModal({
       });
     });
 
-    if (errors.length > 0) {
+    if (errors?.length > 0) {
       setError(errors.join(", "));
     }
 
@@ -123,7 +123,7 @@ export default function HighlightUploadModal({
   };
 
   const handleUpload = async () => {
-    if (files.length === 0) return;
+    if (files?.length === 0) return;
     if (!selectedReelId) {
       setError("Please select a reel");
       return;
@@ -135,13 +135,13 @@ export default function HighlightUploadModal({
     try {
       // Get existing highlights count for the selected reel
       const existingHighlights = await highlightsApi.getHighlightsByReel(selectedReelId);
-      const existingCount = existingHighlights.length;
+      const existingCount = existingHighlights?.length;
 
       // Track upload results
       let failureCount = 0;
 
       // Upload each file
-      for (let i = 0; i < files.length; i++) {
+      for (let i = 0; i < files?.length; i++) {
         const fileWithPreview = files[i];
 
         try {
@@ -233,7 +233,7 @@ export default function HighlightUploadModal({
 
   const handleClose = () => {
     // Clean up previews
-    files.forEach((f) => URL.revokeObjectURL(f.preview));
+    files?.forEach((f) => URL.revokeObjectURL(f.preview));
     setFiles([]);
     setSelectedReelId(reelId);
     setSelectedPromptId(undefined);
@@ -262,7 +262,7 @@ export default function HighlightUploadModal({
           onChange={(e) =>
             setSelectedReelId(e.target.value ? parseInt(e.target.value) : undefined)
           }
-          options={reels.map((reel) => ({
+          options={reels?.map((reel) => ({
             value: reel.id.toString(),
             label: reel.name,
           }))}
@@ -281,7 +281,7 @@ export default function HighlightUploadModal({
               ? [{ value: "", label: "Loading prompts..." }]
               : [
                   { value: "", label: "No prompt" },
-                  ...prompts.map((prompt) => ({
+                  ...prompts?.map((prompt) => ({
                     value: prompt.id.toString(),
                     label: prompt.promptCategoryName
                       ? `${prompt.name} (${prompt.promptCategoryName})`
@@ -320,9 +320,9 @@ export default function HighlightUploadModal({
         </div>
 
         {/* File List */}
-        {files.length > 0 && (
+        {files?.length > 0 && (
           <div className="space-y-2 max-h-60 overflow-y-auto">
-            {files.map((fileWithPreview, index) => (
+            {files?.map((fileWithPreview, index) => (
               <div
                 key={index}
                 className="flex items-center gap-3 p-3 bg-bg-col/30 rounded border border-bg-col"
@@ -389,10 +389,10 @@ export default function HighlightUploadModal({
           <Button
             onClick={handleUpload}
             isLoading={isUploading}
-            disabled={files.length === 0}
+            disabled={files?.length === 0}
             className="flex-1"
           >
-            Upload {files.length > 0 && `(${files.length})`}
+            Upload {files?.length && `(${files?.length})`}
           </Button>
           <Button
             type="button"

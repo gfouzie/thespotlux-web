@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Camera, Trash, UploadSquare, Xmark } from "iconoir-react";
-import { uploadApi } from "@/api/upload";
+import React, { useState, useEffect } from "react";
+import { EditPencil } from "iconoir-react";
+import { UserProfile } from "@/api/profile";
+import { profileApi } from "@/api/profile";
 import { useAuth } from "@/contexts/AuthContext";
-import { compressImage, validateImageFile } from "@/lib/compression";
+import FriendsListModal from "@/components/friends/FriendsListModal";
+import EditProfileModal from "@/components/profile/EditProfileModal";
 
 interface ProfilePictureSectionProps {
   profileImageUrl: string | null;
   firstName: string | null;
   lastName: string | null;
-  onImageUpdate: (newUrl: string | null) => void;
-  isEditMode: boolean;
+  userId: number;
+  isOwnProfile?: boolean;
 }
 
 /**
@@ -31,232 +33,189 @@ const getUserInitials = (firstName: string | null, lastName: string | null): str
   return "??";
 };
 
+/**
+ * Get full name for display
+ */
+const getFullName = (firstName: string | null, lastName: string | null): string => {
+  const first = firstName?.trim() || "";
+  const last = lastName?.trim() || "";
+
+  if (first && last) {
+    return `${first} ${last}`;
+  } else if (first) {
+    return first;
+  } else if (last) {
+    return last;
+  }
+  return "User";
+};
+
+/**
+ * Format birthday for display
+ */
+const formatBirthday = (birthday: string | null): string => {
+  if (!birthday) return "Not set";
+
+  try {
+    const date = new Date(birthday);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  } catch {
+    return "Not set";
+  }
+};
+
+/**
+ * Format height in cm to feet and inches
+ */
+const formatHeight = (heightCm: number | null): string => {
+  if (!heightCm) return "Not set";
+
+  const totalInches = heightCm / 2.54;
+  const feet = Math.floor(totalInches / 12);
+  const inches = Math.round(totalInches % 12);
+
+  return `${feet}'${inches}"`;
+};
+
+/**
+ * Format weight in kg to lbs
+ */
+const formatWeight = (weightKg: number | null): string => {
+  if (!weightKg) return "Not set";
+
+  const lbs = Math.round(weightKg * 2.20462);
+  return `${lbs} lbs`;
+};
+
 const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   profileImageUrl,
   firstName,
   lastName,
-  onImageUpdate,
-  isEditMode,
+  userId,
+  isOwnProfile = false,
 }) => {
   const { isAuthenticated } = useAuth();
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [showFriendsModal, setShowFriendsModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+
   const initials = getUserInitials(firstName, lastName);
-  const [uploading, setUploading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fullName = getFullName(firstName, lastName);
 
-  const handleFileSelect = async (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const file = event.target.files?.[0];
-    if (!file || !isAuthenticated) return;
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!isAuthenticated) return;
 
-    // Validate file using validation function
-    const validation = validateImageFile(file);
-    if (!validation.valid) {
-      setError(validation.error || "Invalid image file");
-      return;
-    }
-
-    try {
-      setUploading(true);
-      setError(null);
-
-      // Compress the image before uploading (uses default settings)
-      const { compressedFile } = await compressImage(file);
-
-      console.log(
-        `Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB → ` +
-        `${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`
-      );
-
-      const response = await uploadApi.uploadProfilePicture(compressedFile);
-
-      onImageUpdate(response.profileImageUrl);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to upload profile picture"
-      );
-    } finally {
-      setUploading(false);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      try {
+        setLoading(true);
+        const data = await profileApi.getProfile();
+        setProfile(data);
+      } catch (err) {
+        console.error("Failed to load profile:", err);
+      } finally {
+        setLoading(false);
       }
-    }
-  };
+    };
 
-  const handleDelete = async () => {
-    if (!isAuthenticated) return;
+    loadProfile();
+  }, [isAuthenticated]);
 
-    try {
-      setUploading(true);
-      setError(null);
-
-      await uploadApi.deleteProfilePicture();
-
-      onImageUpdate(null);
-      setShowDeleteConfirm(false);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete profile picture"
-      );
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
-  };
+  if (loading) {
+    return (
+      <div className="bg-card-col rounded-lg p-6">
+        <div className="flex items-center justify-center h-32">
+          <div className="w-6 h-6 border-2 border-accent-col border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-card-col rounded-lg p-6">
-      <h2 className="text-xl font-semibold text-text-col mb-4">
-        Profile Picture
-      </h2>
+    <>
+      <div className="bg-card-col rounded-lg p-6 relative">
+        {/* Edit Icon */}
+        {isOwnProfile && (
+          <button
+            type="button"
+            onClick={() => setShowEditModal(true)}
+            className="cursor-pointer absolute top-4 right-4 p-2 text-text-col opacity-70 hover:opacity-100 hover:bg-component-col/50 rounded-full transition-all"
+          >
+            <EditPencil className="w-5 h-5" />
+          </button>
+        )}
 
-      <div className="flex flex-col items-center space-y-4">
-        {/* Profile Picture Display */}
-        <div className="relative group">
-          <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-component-col bg-component-col">
-            {profileImageUrl ? (
-              <img
-                src={profileImageUrl}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-accent-col/20">
-                <span className="text-5xl font-semibold text-text-col">
-                  {initials}
-                </span>
+        <div className="flex items-start justify-between">
+          <div className="flex items-center gap-6">
+            {/* Left: Profile Picture and Friends Link */}
+            <div className="flex flex-col flex-shrink-0">
+              <div className="w-20 h-20 rounded-full overflow-hidden bg-component-col mb-3">
+                {profileImageUrl ? (
+                  <img
+                    src={profileImageUrl}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-accent-col/20">
+                    <span className="text-2xl font-semibold text-text-col">
+                      {initials}
+                    </span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-
-          {/* Edit Overlay (only in edit mode) */}
-          {isEditMode && !uploading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
-                onClick={handleUploadClick}
-                className="cursor-pointer p-3 bg-accent-col rounded-full hover:opacity-80 transition-opacity"
-                aria-label="Upload new picture"
+                onClick={() => setShowFriendsModal(true)}
+                className="cursor-pointer text-sm text-accent-col hover:text-accent-col/80 transition-colors font-medium text-left"
               >
-                <Camera className="w-6 h-6 text-text-col" />
+                View all friends
               </button>
             </div>
-          )}
 
-          {/* Uploading Spinner */}
-          {uploading && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-accent-col border-t-transparent rounded-full animate-spin"></div>
+            {/* Middle: First Name and Last Name stacked */}
+            <div className="flex flex-col justify-center">
+              <div className="text-lg md:text-xl font-semibold text-text-col">
+                {firstName}
+              </div>
+              <div className="text-xl md:text-3xl font-bold text-text-col">
+                {lastName}
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Right: Stats vertically aligned */}
+          <div className="flex flex-col gap-1 text-right mt-8">
+            <div className="flex items-center justify-end">
+              <span className="hidden md:flex text-sm text-text-col opacity-70">Born: </span>
+              <span className="text-sm text-text-col">{formatBirthday(profile?.birthday || null)}</span>
+            </div>
+            <div className="flex items-center justify-end">
+              <span className="hidden md:block text-sm text-text-col opacity-70">Height: </span>
+              <span className="text-sm text-text-col">{formatHeight(profile?.height || null)}</span>
+            </div>
+            <div className="flex items-center justify-end">
+              <span className="hidden md:block text-sm text-text-col opacity-70">Weight: </span>
+              <span className="text-sm text-text-col">{formatWeight(profile?.weight || null)}</span>
+            </div>
+          </div>
         </div>
-
-        {/* Action Buttons (only in edit mode) */}
-        {isEditMode && (
-          <div className="flex items-center space-x-3">
-              <button
-                type="button"
-                onClick={handleUploadClick}
-                disabled={uploading}
-                className="cursor-pointer flex items-center space-x-2 px-4 py-2 bg-accent-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <UploadSquare className="w-4 h-4" />
-                <span>Upload New</span>
-              </button>
-
-            {profileImageUrl && (
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                disabled={uploading}
-                className="cursor-pointer flex items-center space-x-2 px-4 py-2 bg-component-col text-text-col rounded-md hover:bg-red-500/20 hover:border-red-500 border border-component-col transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Trash className="w-4 h-4" />
-                <span>Remove</span>
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* File Input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-          onChange={handleFileSelect}
-          className="hidden"
-          disabled={uploading}
-        />
-
-        {/* Error Message */}
-        {error && (
-          <div className="w-full p-3 bg-red-500/10 border border-red-500/30 rounded-md">
-            <p className="text-sm text-red-400">{error}</p>
-          </div>
-        )}
-
-        {/* File Requirements */}
-        {isEditMode && (
-          <div className="w-full p-3 bg-component-col/30 rounded-md">
-            <p className="text-xs text-text-col opacity-70 text-center">
-              Accepted formats: JPEG, PNG, GIF, WebP
-              <br />
-              Maximum size: 10MB
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Delete Confirmation Modal */}
-      {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-card-col rounded-lg p-6 max-w-sm mx-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-text-col">
-                Delete Profile Picture
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                className="cursor-pointer text-text-col opacity-70 hover:opacity-100"
-              >
-                <Xmark className="w-5 h-5" />
-              </button>
-            </div>
+      {/* Friends List Modal */}
+      <FriendsListModal
+        isOpen={showFriendsModal}
+        onClose={() => setShowFriendsModal(false)}
+        userId={userId}
+        isOwnProfile={isOwnProfile}
+      />
 
-            <p className="text-text-col opacity-70 mb-6">
-              Are you sure you want to delete your profile picture? This action
-              cannot be undone.
-            </p>
-
-            <div className="flex items-center space-x-3">
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(false)}
-                disabled={uploading}
-                className="cursor-pointer flex-1 px-4 py-2 bg-component-col text-text-col rounded-md hover:opacity-80 transition-opacity disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleDelete}
-                disabled={uploading}
-                className="cursor-pointer flex-1 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors disabled:opacity-50"
-              >
-                {uploading ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+      />
+    </>
   );
 };
 

@@ -45,7 +45,7 @@ export default function SportTabContent({
         sport
       );
       // Sort by order_ranking
-      const sorted = response.data.sort((a, b) => a.orderRanking - b.orderRanking);
+      const sorted = response.data?.sort((a, b) => a.orderRanking - b.orderRanking);
       setReels(sorted);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load highlight reels");
@@ -118,7 +118,7 @@ export default function SportTabContent({
       )}
 
       {/* Action Buttons */}
-      {isOwner && reels.length > 0 && (
+      {isOwner && reels?.length > 0 && (
         <div className="flex gap-2 mb-4">
           <Button onClick={() => setShowCreateReelModal(true)}>
             Create Reel
@@ -148,7 +148,7 @@ export default function SportTabContent({
         <div className="bg-card-col rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold text-text-col">
-              {selectedReel.name}
+              {selectedReel?.name}
             </h3>
             <button
               type="button"
@@ -172,7 +172,7 @@ export default function SportTabContent({
         onClose={() => setShowCreateReelModal(false)}
         onSuccess={handleCreateReelSuccess}
         sport={sport}
-        existingReelCount={reels.length}
+        existingReelCount={reels?.length}
       />
 
       {/* Edit Reel Modal */}
@@ -191,7 +191,7 @@ export default function SportTabContent({
         onClose={() => setShowUploadModal(false)}
         onSuccess={handleUploadSuccess}
         reelId={selectedReel?.id}
-        reels={reels.map(r => ({ id: r.id, name: r.name }))}
+        reels={reels?.map(r => ({ id: r.id, name: r.name }))}
         sport={sport}
       />
 
@@ -199,7 +199,7 @@ export default function SportTabContent({
       {showStoryViewer && selectedReel && (
         <StoryViewer
           highlights={viewerHighlights}
-          reelName={selectedReel.name}
+          reelName={selectedReel?.name}
           onClose={() => {
             setShowStoryViewer(false);
             setSelectedReel(null);

@@ -14,10 +14,10 @@ interface TeamCardProps {
  */
 const getTeamInitials = (name: string): string => {
   const words = name.trim().split(/\s+/);
-  if (words.length === 1) {
+  if (words?.length === 1) {
     return words[0].substring(0, 2).toUpperCase();
   }
-  return (words[0][0] + words[words.length - 1][0]).toUpperCase();
+  return (words?.[0]?.[0] + words?.[words?.length - 1]?.[0]).toUpperCase();
 };
 
 /**
@@ -35,7 +35,7 @@ const TeamCard: React.FC<TeamCardProps> = ({ team, onClick }) => {
       <div className="flex items-center space-x-4">
         {/* Team Profile Picture or Initials */}
         <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-bg-col">
-          {team.profileImageUrl ? (
+          {team?.profileImageUrl ? (
             <Image
               src={team.profileImageUrl}
               alt={`${team.name} logo`}

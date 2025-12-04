@@ -79,7 +79,7 @@ const Sidebar = ({ className = "" }: SidebarProps) => {
 
   const NavItem = ({ item }: { item: NavItemType }) => {
     const IconComponent = item.icon;
-    const hasChildren = item.children && item.children.length > 0;
+    const hasChildren = item.children && item.children?.length > 0;
     
     return (
       <div>

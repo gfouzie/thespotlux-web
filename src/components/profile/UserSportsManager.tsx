@@ -141,9 +141,9 @@ export default function UserSportsManager({ onSportsUpdate }: UserSportsManagerP
       )}
 
       {/* Current Sports List */}
-      {userSports.length > 0 ? (
+      {userSports?.length > 0 ? (
         <div className="space-y-2 mb-6">
-          {userSports.map((userSport) => (
+          {userSports?.map((userSport) => (
             <div
               key={userSport.sport}
               className="flex items-center justify-between p-3 bg-bg-col/30 rounded border border-bg-col"
@@ -154,18 +154,18 @@ export default function UserSportsManager({ onSportsUpdate }: UserSportsManagerP
                   <p className="text-text-col font-medium capitalize">
                     {userSport.sport}
                   </p>
-                  {userSport.isPrimary && (
+                  {userSport?.isPrimary && (
                     <p className="text-xs text-accent-col">Primary Sport</p>
                   )}
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
-                {!userSport.isPrimary && (
+                {!userSport?.isPrimary && (
                   <Button
                     variant="secondary"
                     size="sm"
-                    onClick={() => handleSetPrimary(userSport.sport)}
+                    onClick={() => handleSetPrimary(userSport?.sport)}
                   >
                     Set Primary
                   </Button>
@@ -173,7 +173,7 @@ export default function UserSportsManager({ onSportsUpdate }: UserSportsManagerP
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => handleDeleteSport(userSport.sport)}
+                  onClick={() => handleDeleteSport(userSport?.sport)}
                 >
                   <Trash className="w-4 h-4" />
                 </Button>
@@ -189,7 +189,7 @@ export default function UserSportsManager({ onSportsUpdate }: UserSportsManagerP
       )}
 
       {/* Add Sport Form */}
-      {availableToAdd.length > 0 ? (
+      {availableToAdd?.length > 0 ? (
         <form onSubmit={handleAddSport} className="space-y-4">
           <div className="border-t border-bg-col/50 pt-4">
             <h4 className="text-sm font-medium text-text-col mb-3">

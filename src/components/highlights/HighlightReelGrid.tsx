@@ -22,7 +22,7 @@ export default function HighlightReelGrid({
   isOwner = false,
   className,
 }: HighlightReelGridProps) {
-  if (reels.length === 0 && !isOwner) {
+  if (reels?.length === 0 && !isOwner) {
     return null;
   }
 
@@ -45,7 +45,7 @@ export default function HighlightReelGrid({
         )}
 
         {/* Highlight Reels */}
-        {reels.map((reel) => (
+        {reels?.map((reel) => (
           <HighlightReelCard
             key={reel.id}
             reel={reel}
@@ -57,7 +57,7 @@ export default function HighlightReelGrid({
         ))}
 
         {/* Empty State for Owner */}
-        {reels.length === 0 && isOwner && (
+        {reels?.length === 0 && isOwner && (
           <div className="flex-1 flex items-center justify-center py-8">
             <p className="text-sm text-text-col/60">
               Create your first highlight reel to get started
