@@ -22,11 +22,8 @@ export default function RequestsCard() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getReceivedRequests(
-        1,
-        100
-      );
-      setRequests(response.data);
+      const requests = await friendshipsApi.getReceivedRequests(0, 100);
+      setRequests(requests);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load requests");
     } finally {

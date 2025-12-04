@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { friendshipsApi, type PaginatedUsersResponse } from "@/api/friendships";
+import { friendshipsApi } from "@/api/friendships";
 import { UserProfile } from "@/api/profile";
 import Link from "next/link";
 
@@ -32,12 +32,12 @@ export default function FriendsPreview({ userId, isOwnProfile = false }: Friends
       setError(null);
 
       // Load first 6 friends for preview
-      const response: PaginatedUsersResponse = isOwnProfile
-        ? await friendshipsApi.getMyFriends(1, 6)
-        : await friendshipsApi.getUserFriends(userId, 1, 6);
+      const friends = isOwnProfile
+        ? await friendshipsApi.getMyFriends(0, 6)
+        : await friendshipsApi.getUserFriends(userId, 0, 6);
 
-      setFriends(response.data);
-      setTotalCount(response.totalCount);
+      setFriends(friends);
+      setTotalCount(friends.length === 6 ? 6 : friends.length);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load friends");
     } finally {

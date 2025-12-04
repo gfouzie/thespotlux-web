@@ -1,6 +1,6 @@
 import { config } from "@/lib/config";
 import { apiRequest, authRequest } from "./shared";
-import { authApi, type LoginResponse } from "./auth";
+import { type LoginResponse } from "./auth";
 
 /**
  * User registration data interface
@@ -34,14 +34,12 @@ export interface User {
 }
 
 /**
- * Paginated users response interface
+ * Query parameters for fetching users
  */
-export interface PaginatedUsersResponse {
-  data: User[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  hasMore: boolean;
+export interface GetUsersParams {
+  offset?: number;
+  limit?: number;
+  search?: string;
 }
 
 /**
@@ -88,24 +86,16 @@ export const userApi = {
   },
 
   /**
-   * Get paginated list of users with optional search (authenticated)
+   * Get list of users with pagination and optional search (authenticated)
    */
-  getUsers: async (
-    page: number = 1,
-    itemsPerPage: number = 20,
-    search?: string
-  ): Promise<PaginatedUsersResponse> => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
-    });
+  getUsers: async (params?: GetUsersParams): Promise<User[]> => {
+    const queryParams = new URLSearchParams();
 
-    if (search) {
-      params.append("search", search);
-    }
+    if (params?.offset !== undefined) queryParams.append("offset", params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append("limit", params.limit.toString());
+    if (params?.search) queryParams.append("search", params.search);
 
-    return authRequest<PaginatedUsersResponse>(
-      `${config.apiBaseUrl}/api/v1/users?${params}`
-    );
+    const url = `${config.apiBaseUrl}/api/v1/users${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    return authRequest<User[]>(url);
   },
 };

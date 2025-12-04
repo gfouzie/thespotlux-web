@@ -34,13 +34,16 @@ export default function SearchPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await userApi.getUsers(
-        page,
-        itemsPerPage,
-        debouncedSearch || undefined
-      );
-      setUsers(response.data);
-      setTotalCount(response.totalCount);
+      const users = await userApi.getUsers({
+        offset: (page - 1) * itemsPerPage,
+        limit: itemsPerPage,
+        search: debouncedSearch || undefined,
+      });
+      setUsers(users);
+      // We can only determine if there are more pages by checking if we got a full page
+      if (users.length < itemsPerPage) {
+        setTotalCount((page - 1) * itemsPerPage + users.length);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load users");
     } finally {
@@ -54,10 +57,16 @@ export default function SearchPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await friendshipsApi.getMyFriends(page, itemsPerPage);
-      setUsers(response.data);
-      setTotalCount(response.totalCount);
-      setFriendsCount(response.totalCount);
+      const friends = await friendshipsApi.getMyFriends(
+        (page - 1) * itemsPerPage,
+        itemsPerPage
+      );
+      setUsers(friends);
+      // We can only determine if there are more pages by checking if we got a full page
+      if (friends.length < itemsPerPage) {
+        setTotalCount((page - 1) * itemsPerPage + friends.length);
+        setFriendsCount((page - 1) * itemsPerPage + friends.length);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load friends");
     } finally {
@@ -70,11 +79,10 @@ export default function SearchPage() {
     const loadFriendsCount = async () => {
       if (!isAuthenticated) return;
       try {
-        const response = await friendshipsApi.getMyFriends(
-          1,
-          1 // Only need the count, not the data
-        );
-        setFriendsCount(response.totalCount);
+        // We fetch first page to estimate the count
+        const friends = await friendshipsApi.getMyFriends(0, 20);
+        // If we got a full page, there might be more, otherwise this is the count
+        setFriendsCount(friends.length);
       } catch (err) {
         console.error("Failed to load friends count:", err);
       }
@@ -117,8 +125,10 @@ export default function SearchPage() {
     // Also reload friends count to keep it accurate
     if (isAuthenticated) {
       try {
-        const response = await friendshipsApi.getMyFriends(1, 1);
-        setFriendsCount(response.totalCount);
+        // Note: Backend no longer returns totalCount
+        // We fetch first page to estimate the count
+        const friends = await friendshipsApi.getMyFriends(0, 20);
+        setFriendsCount(friends.length);
       } catch (err) {
         console.error("Failed to reload friends count:", err);
       }
