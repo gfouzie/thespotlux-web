@@ -40,60 +40,35 @@ export interface HighlightReelUpdateRequest {
 }
 
 /**
- * Paginated response for highlight reels
+ * Query parameters for fetching highlight reels
  */
-export interface PaginatedHighlightReelsResponse {
-  data: HighlightReel[];
-  totalCount: number;
-  page: number;
-  itemsPerPage: number;
-  totalPages: number;
+export interface GetHighlightReelsParams {
+  offset?: number;
+  limit?: number;
+  userId?: number;
+  sport?: string;
+  visibility?: "private" | "public" | "friends_only";
+  searchText?: string;
 }
 
 export const highlightReelsApi = {
   /**
-   * Get all highlight reels for the authenticated user
+   * Get highlight reels with pagination and filtering
    */
   getHighlightReels: async (
-    page: number = 1,
-    itemsPerPage: number = 100,
-    sport?: string
-  ): Promise<PaginatedHighlightReelsResponse> => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
-    });
+    params?: GetHighlightReelsParams
+  ): Promise<HighlightReel[]> => {
+    const queryParams = new URLSearchParams();
 
-    if (sport) {
-      params.append("sport", sport);
-    }
+    if (params?.offset !== undefined) queryParams.append("offset", params.offset.toString());
+    if (params?.limit !== undefined) queryParams.append("limit", params.limit.toString());
+    if (params?.userId !== undefined) queryParams.append("user_id", params.userId.toString());
+    if (params?.sport) queryParams.append("sport", params.sport);
+    if (params?.visibility) queryParams.append("visibility", params.visibility);
+    if (params?.searchText) queryParams.append("searchText", params.searchText);
 
-    return authRequest<PaginatedHighlightReelsResponse>(
-      `${config.apiBaseUrl}/api/v1/highlight_reels?${params}`
-    );
-  },
-
-  /**
-   * Get highlight reels for a specific user by username
-   */
-  getUserHighlightReels: async (
-    username: string,
-    page: number = 1,
-    itemsPerPage: number = 100,
-    sport?: string
-  ): Promise<PaginatedHighlightReelsResponse> => {
-    const params = new URLSearchParams({
-      page: page.toString(),
-      items_per_page: itemsPerPage.toString(),
-    });
-
-    if (sport) {
-      params.append("sport", sport);
-    }
-
-    return authRequest<PaginatedHighlightReelsResponse>(
-      `${config.apiBaseUrl}/api/v1/users/${username}/highlight_reels?${params}`
-    );
+    const url = `${config.apiBaseUrl}/api/v1/highlight_reels${queryParams.toString() ? `?${queryParams.toString()}` : ""}`;
+    return authRequest<HighlightReel[]>(url);
   },
 
   /**

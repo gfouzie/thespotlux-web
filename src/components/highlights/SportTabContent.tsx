@@ -39,13 +39,13 @@ export default function SportTabContent({
     setIsLoading(true);
     setError(null);
     try {
-      const response = await highlightReelsApi.getHighlightReels(
-        1,
-        100,
-        sport
-      );
+      const reels = await highlightReelsApi.getHighlightReels({
+        offset: 0,
+        limit: 100,
+        sport,
+      });
       // Sort by order_ranking
-      const sorted = response.data?.sort((a, b) => a.orderRanking - b.orderRanking);
+      const sorted = reels?.sort((a, b) => a.orderRanking - b.orderRanking);
       setReels(sorted);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load highlight reels");
