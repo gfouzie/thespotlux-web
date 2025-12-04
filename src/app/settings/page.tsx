@@ -1,13 +1,9 @@
 "use client";
 
 import UserSettings from "@/components/settings/UserSettings";
-import PromptCategoryManager from "@/components/settings/PromptCategoryManager";
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
-import { useUser } from "@/contexts/UserContext";
 
 const SettingsPage = () => {
-  const { isSuperuser } = useUser();
-
   // Mock user data - in a real app, this would come from your auth context or API
   const mockUser = {
     id: 1,
@@ -24,15 +20,6 @@ const SettingsPage = () => {
         <div className="max-w-4xl mx-auto space-y-8">
           <h1 className="text-4xl font-bold">Settings</h1>
           <UserSettings user={mockUser} />
-
-          {isSuperuser && (
-            <>
-              <div className="pt-8">
-                <h2 className="text-2xl font-bold mb-4">Admin Tools</h2>
-                <PromptCategoryManager />
-              </div>
-            </>
-          )}
         </div>
       </div>
     </AuthenticatedLayout>

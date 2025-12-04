@@ -1,7 +1,7 @@
 "use client";
 
 import AuthenticatedLayout from "@/components/layout/AuthenticatedLayout";
-import { ChatLines, Tools } from "iconoir-react";
+import { ChatLines, Tools, FolderSettings } from "iconoir-react";
 import Link from "next/link";
 
 const internalToolsCards = [
@@ -10,6 +10,12 @@ const internalToolsCards = [
     href: "/internal-tools/prompts",
     icon: ChatLines,
     description: "Create and manage prompts for different sports and categories",
+  },
+  {
+    name: "Prompt Categories",
+    href: "/internal-tools/prompt-categories",
+    icon: FolderSettings,
+    description: "Organize prompts by creating and managing categories",
   },
   {
     name: "Team Creation",
