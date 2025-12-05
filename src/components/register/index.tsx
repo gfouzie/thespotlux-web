@@ -17,6 +17,7 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
+  birthday: string;
 }
 
 interface State {
@@ -42,6 +43,7 @@ const initialState: State = {
     email: "",
     password: "",
     confirmPassword: "",
+    birthday: "",
   },
   loading: false,
   error: "",
@@ -167,7 +169,7 @@ export default function RegisterPage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword: _, ...registrationData } = state.formData;
 
-      // Register and auto-login the user
+      // Register and auto-login the user (backend validates age requirement)
       const loginResponse = await userApi.registerAndLogin(registrationData);
       console.log("User registered and logged in successfully");
 
@@ -332,6 +334,47 @@ export default function RegisterPage() {
               Lowercase letters and numbers only (2-20 characters)
             </p>
           )}
+        </div>
+
+        <div>
+          <Input
+            id="birthday"
+            type="date"
+            label="Birthday"
+            value={state.formData.birthday || ""}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "birthday",
+                value: e.target.value,
+              })
+            }
+            onInput={(e) => {
+              const target = e.target as HTMLInputElement;
+              target.setCustomValidity("");
+            }}
+            onInvalid={(e) => {
+              const target = e.target as HTMLInputElement;
+              if (target.validity.rangeOverflow || target.validity.rangeUnderflow) {
+                target.setCustomValidity("Must be 13 years old to join");
+              } else if (target.validity.valueMissing) {
+                target.setCustomValidity("Birthday is required");
+              }
+            }}
+            max={
+              new Date(
+                new Date().getFullYear() - 13,
+                new Date().getMonth(),
+                new Date().getDate()
+              )
+                .toISOString()
+                .split("T")[0]
+            }
+            required
+          />
+          <p className="text-text-col/60 text-xs mt-1">
+            You must be at least 13 years old to register
+          </p>
         </div>
 
         <Button

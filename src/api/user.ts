@@ -12,6 +12,7 @@ export interface RegisterUserData {
   username: string;
   email: string;
   password: string;
+  birthday: string; // ISO date string (YYYY-MM-DD)
 }
 
 /**

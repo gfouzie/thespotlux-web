@@ -191,19 +191,19 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
           {/* Right: Stats vertically aligned */}
           <div className="flex flex-col gap-1 text-right mt-8">
             <div className="flex items-center justify-end">
-              <span className="hidden md:flex text-sm text-text-col opacity-70">Born: </span>
+              <span className="hidden md:flex text-sm text-text-col opacity-70 mr-1">Born: </span>
               <span className="text-sm text-text-col">{formatBirthday(profile?.birthday || null)}</span>
             </div>
             <div className="flex items-center justify-end">
-              <span className="hidden md:block text-sm text-text-col opacity-70">Height: </span>
+              <span className="hidden md:block text-sm text-text-col opacity-70 mr-1">Height: </span>
               <span className="text-sm text-text-col">{formatHeight(profile?.height || null)}</span>
             </div>
             <div className="flex items-center justify-end">
-              <span className="hidden md:block text-sm text-text-col opacity-70">Weight: </span>
+              <span className="hidden md:block text-sm text-text-col opacity-70 mr-1">Weight: </span>
               <span className="text-sm text-text-col">{formatWeight(profile?.weight || null)}</span>
             </div>
             <div className="flex items-center justify-end">
-              <span className="hidden md:block text-sm text-text-col opacity-70">Hometown: </span>
+              <span className="hidden md:block text-sm text-text-col opacity-70 mr-1">Hometown: </span>
               <span className="text-sm text-text-col">
                 {formatHometown(profile?.hometownCity || null, profile?.hometownState || null, profile?.hometownCountry || null)}
               </span>
