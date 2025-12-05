@@ -367,4 +367,17 @@ export const uploadApi = {
       s3Key: presignedData.s3Key,
     };
   },
+
+  /**
+   * Delete highlight reel thumbnail
+   * Note: Currently unused in frontend - PATCH with null is used instead
+   */
+  deleteHighlightReelThumbnail: async (reelId: number): Promise<{ message: string }> => {
+    return authRequest<{ message: string }>(
+      `${config.apiBaseUrl}/api/v1/upload/highlight-reel-thumbnail/${reelId}`,
+      {
+        method: "DELETE",
+      }
+    );
+  },
 };
