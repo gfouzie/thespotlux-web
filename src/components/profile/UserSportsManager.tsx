@@ -231,7 +231,7 @@ export default function UserSportsManager({ onSportsUpdate }: UserSportsManagerP
       ) : (
         <div className="border-t border-bg-col/50 pt-4">
           <p className="text-sm text-text-col/60 text-center">
-            You've added all available sports!
+            You&apos;ve added all available sports!
           </p>
         </div>
       )}

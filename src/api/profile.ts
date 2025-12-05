@@ -15,6 +15,9 @@ export interface UserProfile {
   birthday: string | null;
   height: number | null;
   weight: number | null;
+  hometownCity: string | null;
+  hometownState: string | null;
+  hometownCountry: string | null;
   profileImageUrl: string;
   tierId: number | null;
   isSuperuser: boolean;
@@ -30,6 +33,9 @@ export interface ProfileUpdateRequest {
   birthday?: string | null;
   height?: number | null;
   weight?: number | null;
+  hometownCity?: string | null;
+  hometownState?: string | null;
+  hometownCountry?: string | null;
   profileImageUrl?: string | null;
 }
 

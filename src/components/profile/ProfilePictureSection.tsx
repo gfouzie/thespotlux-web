@@ -87,6 +87,11 @@ const formatWeight = (weightKg: number | null): string => {
   return `${lbs} lbs`;
 };
 
+const formatHometown = (city: string | null, state: string | null, country: string | null): string => {
+  const parts = [city, state, country].filter(Boolean);
+  return parts.length > 0 ? parts.join(", ") : "Not set";
+};
+
 const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   profileImageUrl,
   firstName,
@@ -101,7 +106,6 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
   const [showEditModal, setShowEditModal] = useState(false);
 
   const initials = getUserInitials(firstName, lastName);
-  const fullName = getFullName(firstName, lastName);
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -197,6 +201,12 @@ const ProfilePictureSection: React.FC<ProfilePictureSectionProps> = ({
             <div className="flex items-center justify-end">
               <span className="hidden md:block text-sm text-text-col opacity-70">Weight: </span>
               <span className="text-sm text-text-col">{formatWeight(profile?.weight || null)}</span>
+            </div>
+            <div className="flex items-center justify-end">
+              <span className="hidden md:block text-sm text-text-col opacity-70">Hometown: </span>
+              <span className="text-sm text-text-col">
+                {formatHometown(profile?.hometownCity || null, profile?.hometownState || null, profile?.hometownCountry || null)}
+              </span>
             </div>
           </div>
         </div>
