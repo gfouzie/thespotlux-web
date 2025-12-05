@@ -11,6 +11,7 @@ import AuthFormContainer from "@/components/auth/AuthFormContainer";
 interface FormData {
   firstName: string;
   lastName: string;
+  username: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -35,6 +36,7 @@ const initialState: State = {
   formData: {
     firstName: "",
     lastName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -89,7 +91,17 @@ export default function RegisterPage() {
       ) {
         dispatch({
           type: "SET_ERROR",
-          error: "First and last name must be letters only (2-30).",
+          error: "First and last name must only contain letters.",
+        });
+        return;
+      }
+
+      // Validate username
+      const usernamePattern = /^[a-z0-9]{2,20}$/;
+      if (!usernamePattern.test(state.formData.username)) {
+        dispatch({
+          type: "SET_ERROR",
+          error: "Username must only contain lowercase letters and numbers.",
         });
         return;
       }
@@ -104,17 +116,8 @@ export default function RegisterPage() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword: _, ...registrationData } = state.formData;
 
-      // Generate username from email (can be changed during onboarding)
-      const username = state.formData.email
-        .split("@")[0]
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
-
       // Register and auto-login the user
-      const loginResponse = await userApi.registerAndLogin({
-        ...registrationData,
-        username,
-      });
+      const loginResponse = await userApi.registerAndLogin(registrationData);
       console.log("User registered and logged in successfully");
 
       // Set the tokens in auth context
@@ -149,48 +152,12 @@ export default function RegisterPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            id="firstName"
-            type="text"
-            label="First Name"
-            placeholder="First name"
-            value={state.formData.firstName}
-            onChange={(e) =>
-              dispatch({
-                type: "UPDATE_FIELD",
-                field: "firstName",
-                value: e.target.value,
-              })
-            }
-            required
-            minLength={2}
-            maxLength={30}
-          />
-          <Input
-            id="lastName"
-            type="text"
-            label="Last Name"
-            placeholder="Last name"
-            value={state.formData.lastName}
-            onChange={(e) =>
-              dispatch({
-                type: "UPDATE_FIELD",
-                field: "lastName",
-                value: e.target.value,
-              })
-            }
-            required
-            minLength={2}
-            maxLength={30}
-          />
-        </div>
         <Input
           id="email"
           type="email"
           label="Email"
           placeholder="your@email.com"
-          value={state.formData.email}
+          value={state.formData.email || ""}
           onChange={(e) =>
             dispatch({
               type: "UPDATE_FIELD",
@@ -207,7 +174,7 @@ export default function RegisterPage() {
             type="password"
             label="Password"
             placeholder="Create a secure password"
-            value={state.formData.password}
+            value={state.formData.password || ""}
             onChange={(e) =>
               dispatch({
                 type: "UPDATE_FIELD",
@@ -229,7 +196,7 @@ export default function RegisterPage() {
           type="password"
           label="Confirm Password"
           placeholder="Confirm your password"
-          value={state.formData.confirmPassword}
+          value={state.formData.confirmPassword || ""}
           onChange={(e) =>
             dispatch({
               type: "UPDATE_FIELD",
@@ -248,6 +215,65 @@ export default function RegisterPage() {
               : undefined
           }
         />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            id="firstName"
+            type="text"
+            label="First Name"
+            placeholder="First name"
+            value={state.formData.firstName || ""}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "firstName",
+                value: e.target.value,
+              })
+            }
+            required
+            minLength={2}
+            maxLength={30}
+          />
+          <Input
+            id="lastName"
+            type="text"
+            label="Last Name"
+            placeholder="Last name"
+            value={state.formData.lastName || ""}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "lastName",
+                value: e.target.value,
+              })
+            }
+            required
+            minLength={2}
+            maxLength={30}
+          />
+        </div>
+
+        <div>
+          <Input
+            id="username"
+            type="text"
+            label="Username"
+            placeholder="username123"
+            value={state.formData.username || ""}
+            onChange={(e) =>
+              dispatch({
+                type: "UPDATE_FIELD",
+                field: "username",
+                value: e.target.value.toLowerCase(),
+              })
+            }
+            required
+            minLength={2}
+            maxLength={20}
+          />
+          <p className="text-text-col/60 text-xs mt-1">
+            Lowercase letters and numbers only (2-20 characters)
+          </p>
+        </div>
 
         <Button
           type="submit"
