@@ -1,10 +1,10 @@
-import { ChatLines, Tools, Settings, FolderSettings } from "iconoir-react";
+import { ChatLines, Tools, StatsUpSquare, FolderSettings  } from "iconoir-react";
 
 export const superuserNavigationItems = [
   { 
     name: "Internal Tools", 
     href: "/internal-tools", 
-    icon: Settings,
+    icon: StatsUpSquare,
     children: [
       { name: "Prompts", href: "/internal-tools/prompts", icon: ChatLines },
       { name: "Prompt Categories", href: "/internal-tools/prompt-categories", icon: FolderSettings },
