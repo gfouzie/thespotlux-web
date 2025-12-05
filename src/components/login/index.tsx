@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { ApiError } from "@/api";
 import Button from "@/components/common/Button";
 import Input from "@/components/common/Input/index";
+import PrivateInput from "@/components/common/Input/PrivateInput";
 import AuthFormContainer from "@/components/auth/AuthFormContainer";
 
 interface LoginFormData {
@@ -82,15 +83,13 @@ const LoginPage = () => {
         />
 
         <div>
-          <Input
+          <PrivateInput
             id="password"
             name="password"
-            type="password"
             label="Password"
             placeholder="Enter your password"
             value={formData.password}
             onChange={handleInputChange}
-            showPasswordToggle
             required
             minLength={8}
           />

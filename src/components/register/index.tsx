@@ -6,6 +6,7 @@ import { debounce } from "lodash";
 import { userApi, ApiError, validationApi } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Input from "@/components/common/Input/index";
+import PrivateInput from "@/components/common/Input/PrivateInput";
 import Button from "@/components/common/Button";
 import AuthFormContainer from "@/components/auth/AuthFormContainer";
 
@@ -219,9 +220,8 @@ export default function RegisterPage() {
         />
 
         <div>
-          <Input
+          <PrivateInput
             id="password"
-            type="password"
             label="Password"
             placeholder="Create a secure password"
             value={state.formData.password || ""}
@@ -232,7 +232,6 @@ export default function RegisterPage() {
                 value: e.target.value,
               })
             }
-            showPasswordToggle
             required
             minLength={8}
           />
@@ -241,9 +240,8 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        <Input
+        <PrivateInput
           id="confirmPassword"
-          type="password"
           label="Confirm Password"
           placeholder="Confirm your password"
           value={state.formData.confirmPassword || ""}
@@ -254,7 +252,6 @@ export default function RegisterPage() {
               value: e.target.value,
             })
           }
-          showPasswordToggle
           required
           minLength={8}
           error={

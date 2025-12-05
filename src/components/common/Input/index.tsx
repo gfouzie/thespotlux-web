@@ -2,14 +2,13 @@
 
 import { forwardRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { EyeIcon, EyeOffIcon } from "./icons";
 import "./input.css";
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  showPasswordToggle?: boolean;
   icon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -17,22 +16,15 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     {
       label,
       error,
-      showPasswordToggle = false,
       icon,
+      rightIcon,
       className,
       type = "text",
       ...props
     },
     ref
   ) => {
-    const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-
-    const inputType = showPasswordToggle
-      ? showPassword
-        ? "text"
-        : "password"
-      : type;
 
     return (
       <div className="w-full">
@@ -54,7 +46,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 
           <input
             ref={ref}
-            type={inputType}
+            type={type}
             autoComplete="off"
             onFocus={() => setIsFocused(true)}
             onBlur={() => setIsFocused(false)}
@@ -69,8 +61,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
               // Icon padding
               icon && "pl-10",
 
-              // Password toggle padding
-              showPasswordToggle && "pr-12",
+              // Right icon padding
+              rightIcon && "pr-12",
 
               // Error state
               error && "border-red-500 focus:ring-red-500",
@@ -83,14 +75,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
 
-          {showPasswordToggle && (
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-col/60 hover:text-text-col transition-colors cursor-pointer"
-            >
-              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
-            </button>
+          {rightIcon && (
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+              {rightIcon}
+            </div>
           )}
         </div>
 
