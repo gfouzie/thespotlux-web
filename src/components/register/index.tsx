@@ -1,8 +1,9 @@
 "use client";
 
-import { useReducer } from "react";
+import { useReducer, useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { userApi, ApiError } from "@/api";
+import { debounce } from "lodash";
+import { userApi, ApiError, validationApi } from "@/api";
 import { useAuth } from "@/contexts/AuthContext";
 import Input from "@/components/common/Input/index";
 import Button from "@/components/common/Button";
@@ -77,12 +78,61 @@ export default function RegisterPage() {
   const { setTokens } = useAuth();
   const [state, dispatch] = useReducer(registrationReducer, initialState);
 
+  // Availability state
+  const [usernameAvailability, setUsernameAvailability] = useState<boolean | null>(null);
+
+  // Debounced username check function
+  const checkUsernameAvailability = useMemo(
+    () =>
+      debounce(async (username: string) => {
+        if (!username || username.length < 2) {
+          setUsernameAvailability(null);
+          return;
+        }
+
+        try {
+          const result = await validationApi.checkUsernameAvailability(username);
+          setUsernameAvailability(result.available);
+        } catch (error) {
+          console.error("Username check failed:", error);
+          setUsernameAvailability(null);
+        }
+      }, 500),
+    []
+  );
+
+  // Clear availability immediately when username changes (before debounce)
+  useEffect(() => {
+    setUsernameAvailability(null);
+  }, [state.formData.username]);
+
+  // Trigger debounced check when username changes
+  useEffect(() => {
+    checkUsernameAvailability(state.formData.username);
+  }, [state.formData.username, checkUsernameAvailability]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => {
+    return () => {
+      checkUsernameAvailability.cancel();
+    };
+  }, [checkUsernameAvailability]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     dispatch({ type: "SET_ATTEMPTED_SUBMIT", attempted: true });
     dispatch({ type: "SET_LOADING", loading: true });
 
     try {
+      // Check if username is available
+      if (usernameAvailability === false) {
+        dispatch({
+          type: "SET_ERROR",
+          error: "Username is already taken.",
+        });
+        return;
+      }
+
       // Validate first/last name contain only letters
       const namePattern = /^[A-Za-z]{2,30}$/;
       if (
@@ -270,9 +320,21 @@ export default function RegisterPage() {
             minLength={2}
             maxLength={20}
           />
-          <p className="text-text-col/60 text-xs mt-1">
-            Lowercase letters and numbers only (2-20 characters)
-          </p>
+          {usernameAvailability === true && state.formData.username && (
+            <p className="text-green-500 text-xs mt-1">
+              {state.formData.username} is available
+            </p>
+          )}
+          {usernameAvailability === false && state.formData.username && (
+            <p className="text-red-500 text-xs mt-1">
+              {state.formData.username} is already taken
+            </p>
+          )}
+          {!state.formData.username && (
+            <p className="text-text-col/60 text-xs mt-1">
+              Lowercase letters and numbers only (2-20 characters)
+            </p>
+          )}
         </div>
 
         <Button
