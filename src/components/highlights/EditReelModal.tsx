@@ -175,29 +175,18 @@ export default function EditReelModal({
         });
       }
 
-      let thumbnailUrl: string | null = reel.thumbnailUrl || null;
-      let shouldUpdateThumbnail = false;
-
-      // Handle thumbnail removal
-      if (shouldRemoveThumbnail) {
-        thumbnailUrl = null;
-        shouldUpdateThumbnail = true;
-      }
       // Upload new thumbnail if one was selected
-      else if (thumbnailFile) {
-        const { fileUrl } = await uploadApi.uploadHighlightReelThumbnail(
-          reel.id,
-          thumbnailFile
-        );
-        thumbnailUrl = fileUrl;
-        shouldUpdateThumbnail = true;
+      // The upload API will automatically update the reel's thumbnail_url
+      if (thumbnailFile) {
+        await uploadApi.uploadHighlightReelThumbnail(reel.id, thumbnailFile);
       }
 
-      // Update the reel with the new thumbnail and/or visibility
+      // Prepare update data for other fields
       const updateData: { thumbnailUrl?: string | null; visibility?: "private" | "public" | "friends_only" } = {};
 
-      if (shouldUpdateThumbnail && thumbnailUrl !== reel.thumbnailUrl) {
-        updateData.thumbnailUrl = thumbnailUrl;
+      // Handle thumbnail removal (set to null)
+      if (shouldRemoveThumbnail) {
+        updateData.thumbnailUrl = null;
       }
 
       if (visibility !== reel.visibility) {

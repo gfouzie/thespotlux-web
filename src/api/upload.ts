@@ -91,14 +91,6 @@ interface TeamPictureUploadCompleteRequest extends BaseUploadCompleteRequest {
 }
 
 /**
- * Highlight video upload completion request
- */
-interface HighlightVideoUploadCompleteRequest extends BaseUploadCompleteRequest {
-  uploadType: "highlight_video";
-  highlightReelId: number;
-}
-
-/**
  * Highlight reel thumbnail upload completion request
  */
 interface HighlightReelThumbnailUploadCompleteRequest extends BaseUploadCompleteRequest {
@@ -120,7 +112,6 @@ interface HighlightThumbnailUploadCompleteRequest extends BaseUploadCompleteRequ
 export type UploadCompleteRequest =
   | ProfilePictureUploadCompleteRequest
   | TeamPictureUploadCompleteRequest
-  | HighlightVideoUploadCompleteRequest
   | HighlightReelThumbnailUploadCompleteRequest
   | HighlightThumbnailUploadCompleteRequest;
 
@@ -308,7 +299,7 @@ export const uploadApi = {
   uploadHighlightReelThumbnail: async (
     reelId: number,
     file: File
-  ): Promise<{ fileUrl: string; s3Key: string }> => {
+  ): Promise<ProfilePictureUploadResponse> => {
     // Step 1: Request presigned URL from backend
     const presignedRequest: PresignedUrlRequest = {
       filename: file.name,
@@ -328,11 +319,20 @@ export const uploadApi = {
     // Step 2: Upload directly to S3
     await uploadToS3(file, presignedData);
 
-    // Return the file URL and S3 key
-    return {
-      fileUrl: presignedData.fileUrl,
+    // Step 3: Notify backend of completion
+    const completeRequest: UploadCompleteRequest = {
       s3Key: presignedData.s3Key,
+      uploadType: "highlight_reel_thumbnail",
+      highlightReelId: reelId,
     };
+
+    return authRequest<ProfilePictureUploadResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/complete`,
+      {
+        method: "POST",
+        body: JSON.stringify(completeRequest),
+      }
+    );
   },
 
   /**
@@ -341,7 +341,7 @@ export const uploadApi = {
   uploadHighlightThumbnail: async (
     highlightId: number,
     file: File
-  ): Promise<{ fileUrl: string; s3Key: string }> => {
+  ): Promise<ProfilePictureUploadResponse> => {
     // Step 1: Request presigned URL from backend
     const presignedRequest: PresignedUrlRequest = {
       filename: file.name,
@@ -361,11 +361,20 @@ export const uploadApi = {
     // Step 2: Upload directly to S3
     await uploadToS3(file, presignedData);
 
-    // Return the file URL and S3 key
-    return {
-      fileUrl: presignedData.fileUrl,
+    // Step 3: Notify backend of completion
+    const completeRequest: UploadCompleteRequest = {
       s3Key: presignedData.s3Key,
+      uploadType: "highlight_thumbnail",
+      highlightId: highlightId,
     };
+
+    return authRequest<ProfilePictureUploadResponse>(
+      `${config.apiBaseUrl}/api/v1/upload/complete`,
+      {
+        method: "POST",
+        body: JSON.stringify(completeRequest),
+      }
+    );
   },
 
   /**
