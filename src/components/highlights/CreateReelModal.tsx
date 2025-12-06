@@ -13,7 +13,6 @@ interface CreateReelModalProps {
   onClose: () => void;
   onSuccess: () => void;
   sport: string;
-  existingReelCount: number;
 }
 
 export default function CreateReelModal({
@@ -21,7 +20,6 @@ export default function CreateReelModal({
   onClose,
   onSuccess,
   sport,
-  existingReelCount,
 }: CreateReelModalProps) {
   const [formData, setFormData] = useState({
     name: "",
@@ -36,10 +34,10 @@ export default function CreateReelModal({
     setIsSubmitting(true);
 
     try {
+      // Backend auto-assigns orderRanking
       const createRequest: HighlightReelCreateRequest = {
         name: formData.name,
         sport: sport,
-        orderRanking: existingReelCount + 1,
         visibility: formData.visibility,
       };
 

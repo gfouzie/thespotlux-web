@@ -23,7 +23,6 @@ export interface HighlightReel {
 export interface HighlightReelCreateRequest {
   name: string;
   sport: string;
-  orderRanking: number;
   visibility?: "private" | "public" | "friends_only";
   thumbnailUrl?: string;
 }

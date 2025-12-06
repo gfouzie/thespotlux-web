@@ -172,7 +172,6 @@ export default function SportTabContent({
         onClose={() => setShowCreateReelModal(false)}
         onSuccess={handleCreateReelSuccess}
         sport={sport}
-        existingReelCount={reels?.length}
       />
 
       {/* Edit Reel Modal */}
