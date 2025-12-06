@@ -88,7 +88,7 @@ const MobileNav = ({ className = "" }: MobileNavProps) => {
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-bg-col/80 backdrop-blur-sm border-t border-text-col/20 lg:hidden z-50">
+      <div className="fixed bottom-0 left-0 right-0 bg-bg-col/80 backdrop-blur-sm border-t border-text-col/20 lg:hidden z-40">
         <div className="flex items-center justify-around px-2 py-2">
           {navigationItems.map((item) => {
             const IconComponent = item.icon;
