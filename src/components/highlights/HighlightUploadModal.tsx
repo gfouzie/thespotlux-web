@@ -133,10 +133,6 @@ export default function HighlightUploadModal({
     setError(null);
 
     try {
-      // Get existing highlights count for the selected reel
-      const existingHighlights = await highlightsApi.getHighlightsByReel(selectedReelId);
-      const existingCount = existingHighlights?.length;
-
       // Track upload results
       let failureCount = 0;
 
@@ -191,7 +187,6 @@ export default function HighlightUploadModal({
           const createRequest: HighlightCreateRequest = {
             highlightReelId: selectedReelId,
             videoUrl: fileUrl,
-            orderIndex: existingCount + i + 1,
             promptId: selectedPromptId,
           };
 

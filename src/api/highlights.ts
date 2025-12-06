@@ -22,7 +22,7 @@ export interface Highlight {
 export interface HighlightCreateRequest {
   highlightReelId: number;
   videoUrl: string;
-  orderIndex: number;
+  orderIndex?: number;
   promptId?: number;
 }
 
